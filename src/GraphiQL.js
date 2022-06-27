@@ -6,9 +6,11 @@ import 'graphiql/graphiql.css';
 import './fix.css';
 
 const digitransitUrl = (apiType, router) =>
-  `https://${
-    apiType === 'dev' ? 'dev-api' : 'api'
-  }.digitransit.fi/routing/v1/routers/${router}/index/graphql`;
+  process.env.REACT_APP_OTP_URL
+    ? process.env.REACT_APP_OTP_URL.replace('{{router}}', router)
+    : `https://${
+        apiType === 'dev' ? 'dev-api' : 'api'
+      }.digitransit.fi/routing/v1/routers/${router}/index/graphql`;
 
 const graphQLFetcher = (apiType, router) => (graphQLParams) =>
   fetch(digitransitUrl(apiType, router), {
