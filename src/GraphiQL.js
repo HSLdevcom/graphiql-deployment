@@ -113,6 +113,8 @@ const GraphiQLRoute = withRouter(({ location, history, router, configs }) => (
   <Route path={"/"+router} render={() => <CustomGraphiQL location={location} push={history.push} replace={history.replace} router={router} configs={configs}/>} />
 ))
 
-export default ({ configs }) => configs.map(config => 
+const GraphiQLRoutes = ({ configs }) => configs.map(config => 
   <GraphiQLRoute key={config.router} router={config.router} configs={configs} />
 )
+
+export default GraphiQLRoutes
