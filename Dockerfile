@@ -1,4 +1,4 @@
-FROM node:12-alpine as build
+FROM node:16-alpine3.16 as build
 MAINTAINER Digitransit version: 0.1
 
 WORKDIR /opt/digitransit-graphql
@@ -6,11 +6,11 @@ WORKDIR /opt/digitransit-graphql
 COPY . ./
 RUN yarn && yarn build
 
-FROM node:12-alpine
+FROM node:16-alpine3.16
 WORKDIR /app
 COPY --from=build /opt/digitransit-graphql/run.sh ./
 COPY --from=build /opt/digitransit-graphql/build ./
 COPY --from=build /opt/digitransit-graphql/serve.json ./
-RUN yarn global add serve
+RUN yarn global add serve@14.x
 EXPOSE 8080
 ENTRYPOINT ["./run.sh"]
