@@ -1,5 +1,5 @@
 FROM node:16-alpine3.16 as build
-MAINTAINER Digitransit version: 0.1
+LABEL version="0.2"
 
 WORKDIR /opt/digitransit-graphql
 
