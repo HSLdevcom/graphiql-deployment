@@ -9,8 +9,8 @@ const configs = [
   { title: 'Finland', router: 'finland' }
 ];
 
-export default class extends React.Component {
-  render() {
+export default class App extends React.Component {
+  render() { 
     return (
       <Router basename="/graphiql">
         <GraphiQL configs={configs} />

@@ -163,7 +163,7 @@ const GraphiQLRoute = withRouter(({ location, history, router, configs }) => (
   />
 ));
 
-export default ({ configs }) =>
+const GraphiQLRoutes = ({ configs }) =>
   configs.map((config) => (
     <GraphiQLRoute
       key={config.router}
@@ -171,3 +171,5 @@ export default ({ configs }) =>
       configs={configs}
     />
   ));
+
+export default GraphiQLRoutes
