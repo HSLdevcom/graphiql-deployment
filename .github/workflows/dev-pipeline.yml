@@ -15,18 +15,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: "Set time zone to Europe/Helsinki"
         uses: zcong1993/setup-timezone@master
         with:
           timezone: "Europe/Helsinki"
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: Install dependencies
         run: yarn
+
       - name: Run linters
         run: yarn lint
+
       - name: Run tests
         run: yarn test
   docker-push:
@@ -37,10 +42,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Set time zone to Europe/Helsinki
         uses: zcong1993/setup-timezone@master
         with:
           timezone: "Europe/Helsinki"
+
       - name: Build docker image from master and push it
         run: ./.github/workflows/scripts/build_and_push.sh
         env:
