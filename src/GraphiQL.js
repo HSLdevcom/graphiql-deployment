@@ -1,9 +1,36 @@
 import React from 'react';
 import { Route, withRouter } from 'react-router-dom';
-import GraphiQL from 'graphiql';
+import GraphiQL, {
+  ToolbarSelect,
+  ToolbarSelectOption,
+  ToolbarButton
+} from 'graphiql';
+import { usePrettifyEditors, useHistoryContext } from '@graphiql/react';
 import 'graphiql/graphiql.css';
 
 import './fix.css';
+
+const PrettifyButton = () => {
+  const prettify = usePrettifyEditors();
+  return (
+    <ToolbarButton
+      onClick={() => prettify()}
+      title="Prettify Query (Shift-Ctrl-P)"
+      label="Prettify"
+    />
+  );
+};
+
+const HistoryButton = () => {
+  const historyContext = useHistoryContext();
+  return (
+    <ToolbarButton
+      onClick={() => historyContext?.toggle()}
+      title="Show History"
+      label="History"
+    />
+  );
+};
 
 const digitransitUrl = (apiType, router) =>
   `https://${
@@ -95,20 +122,12 @@ class CustomGraphiQL extends React.Component {
           this.setState({ operationName })
         }>
         <GraphiQL.Toolbar>
-          <GraphiQL.Button
-            onClick={() => this.graphiql.current.handlePrettifyQuery()}
-            title="Prettify Query (Shift-Ctrl-P)"
-            label="Prettify"
-          />
-          <GraphiQL.Button
-            onClick={() => this.graphiql.current.handleToggleHistory()}
-            title="Show History"
-            label="History"
-          />
+          <PrettifyButton />
+          <HistoryButton />
           <span style={{ paddingTop: 3 }}>Endpoint:</span>
-          <GraphiQL.Select label="Endpoint" title="Change GraphQL endpoint">
+          <ToolbarSelect label="Endpoint" title="Change GraphQL endpoint">
             {this.props.configs.map((config) => (
-              <GraphiQL.SelectOption
+              <ToolbarSelectOption
                 key={config.router}
                 title={config.title}
                 label={config.title}
@@ -126,10 +145,10 @@ class CustomGraphiQL extends React.Component {
                 }
               />
             ))}
-          </GraphiQL.Select>
+          </ToolbarSelect>
           <span style={{ paddingTop: 3 }}>API version:</span>
-          <GraphiQL.Select label="API version" title="Change API version">
-            <GraphiQL.SelectOption
+          <ToolbarSelect label="API version" title="Change API version">
+            <ToolbarSelectOption
               title="Production"
               label="Production"
               selected={this.state.apiType === 'prod'}
@@ -141,7 +160,7 @@ class CustomGraphiQL extends React.Component {
               selected={this.state.apiType === 'dev'}
               onSelect={() => this.setState({ apiType: 'dev' })}
             />
-          </GraphiQL.Select>
+          </ToolbarSelect>
         </GraphiQL.Toolbar>
       </GraphiQL>
     );
@@ -172,4 +191,4 @@ const GraphiQLRoutes = ({ configs }) =>
     />
   ));
 
-export default GraphiQLRoutes
+export default GraphiQLRoutes;
