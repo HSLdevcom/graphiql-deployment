@@ -13,20 +13,20 @@ const API_TYPES = {
   dev: { label: 'Development' }
 };
 
-const digitransitUrl = (apiType, router) =>
-  `https://${
-    apiType === 'dev' ? 'dev-api' : 'api'
-  }.digitransit.fi/routing/v1/routers/${router}/index/graphql`;
-
-const graphQLFetcher = (apiType, router) => (graphQLParams) =>
-  fetch(digitransitUrl(apiType, router), {
+const graphQLFetcher = (apiUrl) => (graphQLParams) =>
+  fetch(apiUrl, {
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(graphQLParams)
   }).then((response) => response.json());
 
-
-const isSelected = (config, router) => config.router === router;
+const areConfigsEqual = (config1, config2) => {
+  return config1.router === config2.router &&
+    Boolean(config1.api) &&
+    Boolean(config2.api)
+    ? config1.api === config2.api
+    : true;
+};
 
 const getQueryString = (query, variables, operationName) => {
   const urlSearchParams = new URLSearchParams();
@@ -61,11 +61,7 @@ const ToggleHistoryButton = () => {
   );
 };
 
-const buildLookup = (arr, propName) =>
-  Array.isArray(arr) &&
-  arr.reduce((acc, x) => ({ ...acc, [x[propName]]: x }), {});
-
-const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
+const CustomGraphiQL = ({ location, push, configs, config, replace }) => {
   const [query, setQuery] = useState();
   const [variables, setVariables] = useState();
   const [operationName, setOperationName] = useState();
@@ -73,9 +69,6 @@ const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
     (!!location.state && location.state.apiType) ||
       (window.location.hostname === 'api.digitransit.fi' ? 'prod' : 'dev')
   );
-
-  // build { waltti: {router: 'waltti', title: 'Waltti:, ...}} style lookup
-  const endpoints = useMemo(() => buildLookup(configs, 'router'), [configs]);
 
   useEffect(() => {
     const queryString = getQueryString(query, variables, operationName);
@@ -107,9 +100,33 @@ const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
     [location]
   );
 
+  const hasRoute = (router, api, apiType) =>
+    Boolean(
+      configs.find(
+        (config) =>
+          config.router === router &&
+          config.api === api &&
+          config.routerUrl[apiType]
+      )
+    );
+
+  const getDefaultRouter = (router) => getDefaultApi(configs, router).router;
+
+  const onSelectApi = (router, api) => {
+    const pathname = hasRoute(router, api, apiType)
+      ? `/${router}/${api}`
+      : '/' + getDefaultRouter(router);
+
+    push({
+      pathname,
+      search: getQueryString(query, variables, operationName),
+      state: { apiType: apiType }
+    });
+  };
+
   return (
     <GraphiQL
-      fetcher={graphQLFetcher(apiType, router)}
+      fetcher={graphQLFetcher(config.routerUrl[apiType])}
       query={query ? query : undefined}
       variables={variables ? variables : undefined}
       operationName={operationName ? operationName : undefined}
@@ -121,23 +138,19 @@ const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
         <ToggleHistoryButton />
         <span style={{ paddingTop: 3 }}>Endpoint:</span>
         <GraphiQL.Menu
-          label={router ? endpoints[router].title : 'Endpoint'}
+          label={config.title || 'Endpoint'}
           title="Change GraphQL endpoint">
-          {configs.map((config) => (
-            <GraphiQL.MenuItem
-              key={config.router}
-              title={config.title}
-              label={config.title}
-              selected={isSelected(config, router)}
-              onSelect={() =>
-                push({
-                  pathname: `/${config.router}`,
-                  search: getQueryString(query, variables, operationName),
-                  state: { apiType: apiType }
-                })
-              }
-            />
-          ))}
+          {configs
+            .filter((it) => Boolean(it.routerUrl[apiType]))
+            .map((it) => (
+              <GraphiQL.MenuItem
+                key={it.router + ':' + it.api}
+                title={it.title}
+                label={it.title}
+                selected={areConfigsEqual(it, config)}
+                onSelect={() => onSelectApi(it.router, it.api)}
+              />
+            ))}
         </GraphiQL.Menu>
         <span style={{ paddingTop: 3 }}>API version:</span>
         <GraphiQL.Menu
@@ -149,7 +162,15 @@ const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
               title={API_TYPES[type].label}
               label={API_TYPES[type].label}
               selected={apiType === type}
-              onSelect={() => setApiType(type)}
+              onSelect={() => {
+                if (hasRoute(config.router, config.api, type)) {
+                  setApiType(type);
+                } else {
+                  alert(
+                    `No endpoint exists for API version: ${API_TYPES[type].label}`
+                  );
+                }
+              }}
             />
           ))}
         </GraphiQL.Menu>
@@ -158,28 +179,70 @@ const CustomGraphiQL = ({ location, push, configs, replace, router }) => {
   );
 };
 
-const GraphiQLRoute = withRouter(({ location, history, router, configs }) => (
-  <Route
-    path={'/' + router}
-    render={() => (
-      <CustomGraphiQL
-        location={location}
-        push={history.push}
-        replace={history.replace}
-        router={router}
-        configs={configs}
-      />
-    )}
-  />
-));
+const GraphiQLRoute = withRouter(
+  ({ location, history, configs, config, isDefault = false }) => (
+    <Route
+      path={isDefault ? '/' + config.router : `/${config.router}/${config.api}`}
+      exact
+      render={() => (
+        <>
+          <CustomGraphiQL
+            location={location}
+            push={history.push}
+            replace={history.replace}
+            configs={configs}
+            config={config}
+          />
+        </>
+      )}
+    />
+  )
+);
 
-const GraphiQLRoutes = ({ configs }) =>
-  configs.map((config) => (
+const parseConfig = (configObjs) =>
+  configObjs.reduce(
+    (acc, config) =>
+      Object.entries(config.api).reduce(
+        (acc, [apiName, configApi]) => [
+          ...acc,
+          {
+            ...configApi,
+            api: apiName,
+            router: config.router
+          }
+        ],
+        acc
+      ),
+    []
+  );
+
+const getDefaultApi = (configs, router) => {
+  return configs.find((config) => config.router === router);
+};
+
+const GraphiQLRoutes = ({ configObjs }) => {
+  // build config list for toolbar selectors
+  const configs = useMemo(() => parseConfig(configObjs), [configObjs]);
+
+  const routes = configs.map((config) => (
     <GraphiQLRoute
-      key={config.router}
-      router={config.router}
+      key={`${config.router}:${config.api}`}
       configs={configs}
+      config={config}
     />
   ));
+
+  // default route is route without api version (eg. /hsl --> /hsl/v1)
+  const defaultRoutes = configObjs.map((configObj) => (
+    <GraphiQLRoute
+      key={`${configObj.router}`}
+      configs={configs}
+      config={getDefaultApi(configs, configObj.router)}
+      isDefault
+    />
+  ));
+
+  return [...defaultRoutes, ...routes];
+};
 
 export default GraphiQLRoutes;
