@@ -125,9 +125,9 @@ class CustomGraphiQL extends React.Component {
           <PrettifyButton />
           <HistoryButton />
           <span style={{ paddingTop: 3 }}>Endpoint:</span>
-          <ToolbarSelect label="Endpoint" title="Change GraphQL endpoint">
+          <GraphiQL.Menu label="Endpoint" title="Change GraphQL endpoint">
             {this.props.configs.map((config) => (
-              <ToolbarSelectOption
+              <GraphiQL.MenuItem
                 key={config.router}
                 title={config.title}
                 label={config.title}
@@ -145,22 +145,22 @@ class CustomGraphiQL extends React.Component {
                 }
               />
             ))}
-          </ToolbarSelect>
+          </GraphiQL.Menu>
           <span style={{ paddingTop: 3 }}>API version:</span>
-          <ToolbarSelect label="API version" title="Change API version">
-            <ToolbarSelectOption
+          <GraphiQL.Menu label="API version" title="Change API version">
+            <GraphiQL.MenuItem
               title="Production"
               label="Production"
               selected={this.state.apiType === 'prod'}
               onSelect={() => this.setState({ apiType: 'prod' })}
             />
-            <GraphiQL.SelectOption
+            <GraphiQL.MenuItem
               title="Development"
               label="Development"
               selected={this.state.apiType === 'dev'}
               onSelect={() => this.setState({ apiType: 'dev' })}
             />
-          </ToolbarSelect>
+          </GraphiQL.Menu>
         </GraphiQL.Toolbar>
       </GraphiQL>
     );
