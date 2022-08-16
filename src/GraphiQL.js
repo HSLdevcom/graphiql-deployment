@@ -6,18 +6,12 @@ import { usePrettifyEditors, useHistoryContext } from '@graphiql/react';
 import 'graphiql/graphiql.css';
 
 import './fix.css';
+import graphQLFetcher from './api/graphQLFetcher';
 
 const API_TYPES = {
   prod: { label: 'Production' },
   dev: { label: 'Development' }
 };
-
-const graphQLFetcher = (apiUrl) => (graphQLParams) =>
-  fetch(apiUrl, {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(graphQLParams)
-  }).then((response) => response.json());
 
 const areConfigsEqual = (config1, config2) => {
   return config1.router === config2.router &&
