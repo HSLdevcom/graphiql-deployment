@@ -156,7 +156,9 @@ const CustomGraphiQLWrapper = ({
   push,
   configs,
   config,
-  replace
+  replace,
+  subscriptionKey,
+  subscriptionKeyParam
 }) => {
   const [query, setQuery] = useState();
   const [variables, setVariables] = useState();
@@ -226,7 +228,9 @@ const CustomGraphiQLWrapper = ({
       apiType={apiType}
       config={config}
       configs={configs}
-      graphQLFetcher={graphQLFetcher}
+      graphQLFetcher={(apiUrl) =>
+        graphQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
+      }
       hasRoute={hasRoute}
       onSelectApi={onSelectApi}
       operationName={operationName}
@@ -240,23 +244,46 @@ const CustomGraphiQLWrapper = ({
   );
 };
 
-const GraphiQLRoute = withRouter(
-  ({ location, history, configs, config, isDefault = false }) => (
-    <Route
-      path={isDefault ? '/' + config.router : `/${config.router}/${config.api}`}
-      exact
-      render={() => (
-        <>
-          <CustomGraphiQLWrapper
-            location={location}
-            push={history.push}
-            replace={history.replace}
-            configs={configs}
-            config={config}
-          />
-        </>
-      )}
+const withSubscriptionKey = (Component) => (props) =>
+  (
+    <Component
+      {...props}
+      subscriptionKey={process.env.REACT_APP_API_SUBSCRIPTION_KEY}
+      subscriptionKeyParam={process.env.REACT_APP_API_SUBSCRIPTION_KEY_PARAM}
     />
+  );
+
+const GraphiQLRoute = withSubscriptionKey(
+  withRouter(
+    ({
+      location,
+      history,
+      configs,
+      config,
+      isDefault = false,
+      subscriptionKey = null,
+      subscriptionKeyParam = null
+    }) => (
+      <Route
+        path={
+          isDefault ? '/' + config.router : `/${config.router}/${config.api}`
+        }
+        exact
+        render={() => (
+          <>
+            <CustomGraphiQLWrapper
+              location={location}
+              push={history.push}
+              replace={history.replace}
+              configs={configs}
+              config={config}
+              subscriptionKey={subscriptionKey}
+              subscriptionKeyParam={subscriptionKeyParam}
+            />
+          </>
+        )}
+      />
+    )
   )
 );
 
