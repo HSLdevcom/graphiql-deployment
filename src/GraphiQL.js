@@ -7,7 +7,6 @@ import 'graphiql/graphiql.css';
 
 import './fix.css';
 
-
 const API_TYPES = {
   prod: { label: 'Production' },
   dev: { label: 'Development' }
@@ -61,7 +60,110 @@ const ToggleHistoryButton = () => {
   );
 };
 
-const CustomGraphiQL = ({ location, push, configs, config, replace }) => {
+/**
+ * Customized GraphiQL UI. Component should not be re-rendered on state change
+ * and thus state management is responsibility of parent
+ * (CustomGraphiQLWrapper) component and this component is memoized with custom
+ * property comparator function to allow re-rendering only when property
+ * `apiType` changes.
+ *
+ * @param {Object.<String, *>} props
+ */
+const PureCustomGraphiQL = ({
+  config,
+  configs,
+  graphQLFetcher,
+  query,
+  variables,
+  operationName,
+  setQuery,
+  setVariables,
+  setOperationName,
+  onSelectApi,
+  apiType,
+  hasRoute,
+  setApiType,
+  alert
+}) => (
+  <GraphiQL
+    fetcher={graphQLFetcher(config.routerUrl[apiType])}
+    query={query ? query : undefined}
+    variables={variables ? variables : undefined}
+    operationName={operationName ? operationName : undefined}
+    onEditQuery={(query) => setQuery(query)}
+    onEditVariables={(variables) => setVariables(variables)}
+    onEditOperationName={(operationName) => setOperationName(operationName)}>
+    <GraphiQL.Toolbar>
+      <PrettifyButton />
+      <ToggleHistoryButton />
+      <span
+        style={{
+          paddingTop: 3
+        }}>
+        Endpoint:
+      </span>
+      <GraphiQL.Menu
+        label={config.title || 'Endpoint'}
+        title="Change GraphQL endpoint">
+        {configs
+          .filter((it) => Boolean(it.routerUrl[apiType]))
+          .map((it) => (
+            <GraphiQL.MenuItem
+              key={it.router + ':' + it.api}
+              title={it.title}
+              label={it.title}
+              selected={areConfigsEqual(it, config)}
+              onSelect={() => onSelectApi(it.router, it.api)}
+            />
+          ))}
+      </GraphiQL.Menu>
+      <span
+        style={{
+          paddingTop: 3
+        }}>
+        API version:
+      </span>
+      <GraphiQL.Menu
+        label={apiType ? API_TYPES[apiType].label : 'API version'}
+        title="Change API version">
+        {['prod', 'dev'].map((type) => (
+          <GraphiQL.MenuItem
+            key={type}
+            title={API_TYPES[type].label}
+            label={API_TYPES[type].label}
+            selected={apiType === type}
+            onSelect={() => {
+              if (hasRoute(config.router, config.api, type)) {
+                setApiType(type);
+              } else {
+                alert(
+                  `No endpoint exists for API version: ${API_TYPES[type].label}`
+                );
+              }
+            }}
+          />
+        ))}
+      </GraphiQL.Menu>
+    </GraphiQL.Toolbar>
+  </GraphiQL>
+);
+
+const NonFlickeringCustomGraphiQL = React.memo(
+  PureCustomGraphiQL,
+  (props, newProps) => {
+    // Compare only apiType as the single source of truth for other properties
+    // is window.location and thus rendering is managed by wrapper component.
+    return props.apiType === newProps.apiType;
+  }
+);
+
+const CustomGraphiQLWrapper = ({
+  location,
+  push,
+  configs,
+  config,
+  replace
+}) => {
   const [query, setQuery] = useState();
   const [variables, setVariables] = useState();
   const [operationName, setOperationName] = useState();
@@ -125,57 +227,22 @@ const CustomGraphiQL = ({ location, push, configs, config, replace }) => {
   };
 
   return (
-    <GraphiQL
-      fetcher={graphQLFetcher(config.routerUrl[apiType])}
-      query={query ? query : undefined}
-      variables={variables ? variables : undefined}
-      operationName={operationName ? operationName : undefined}
-      onEditQuery={(query) => setQuery(query)}
-      onEditVariables={(variables) => setVariables(variables)}
-      onEditOperationName={(operationName) => setOperationName(operationName)}>
-      <GraphiQL.Toolbar>
-        <PrettifyButton />
-        <ToggleHistoryButton />
-        <span style={{ paddingTop: 3 }}>Endpoint:</span>
-        <GraphiQL.Menu
-          label={config.title || 'Endpoint'}
-          title="Change GraphQL endpoint">
-          {configs
-            .filter((it) => Boolean(it.routerUrl[apiType]))
-            .map((it) => (
-              <GraphiQL.MenuItem
-                key={it.router + ':' + it.api}
-                title={it.title}
-                label={it.title}
-                selected={areConfigsEqual(it, config)}
-                onSelect={() => onSelectApi(it.router, it.api)}
-              />
-            ))}
-        </GraphiQL.Menu>
-        <span style={{ paddingTop: 3 }}>API version:</span>
-        <GraphiQL.Menu
-          label={apiType ? API_TYPES[apiType].label : 'API version'}
-          title="Change API version">
-          {['prod', 'dev'].map((type) => (
-            <GraphiQL.MenuItem
-              key={type}
-              title={API_TYPES[type].label}
-              label={API_TYPES[type].label}
-              selected={apiType === type}
-              onSelect={() => {
-                if (hasRoute(config.router, config.api, type)) {
-                  setApiType(type);
-                } else {
-                  alert(
-                    `No endpoint exists for API version: ${API_TYPES[type].label}`
-                  );
-                }
-              }}
-            />
-          ))}
-        </GraphiQL.Menu>
-      </GraphiQL.Toolbar>
-    </GraphiQL>
+    <NonFlickeringCustomGraphiQL
+      alert={alert}
+      apiType={apiType}
+      config={config}
+      configs={configs}
+      graphQLFetcher={graphQLFetcher}
+      hasRoute={hasRoute}
+      onSelectApi={onSelectApi}
+      operationName={operationName}
+      query={query}
+      setApiType={setApiType}
+      setOperationName={setOperationName}
+      setQuery={setQuery}
+      setVariables={setVariables}
+      variables={variables}
+    />
   );
 };
 
@@ -186,7 +253,7 @@ const GraphiQLRoute = withRouter(
       exact
       render={() => (
         <>
-          <CustomGraphiQL
+          <CustomGraphiQLWrapper
             location={location}
             push={history.push}
             replace={history.replace}
