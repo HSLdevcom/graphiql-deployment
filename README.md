@@ -8,7 +8,7 @@ Deployment for HSL version of [GraphiQL](https://github.com/graphql/graphiql). P
 REACT_APP_API_SUBSCRIPTION_KEY=key REACT_APP_API_SUBSCRIPTION_KEY_PARAM=digitransit-subscription-key yarn start
 ```
 
-Environment variable `REACT_APP_API_SUBSCRIPTION_KEY` and `REACT_APP_API_SUBSCRIPTION_KEY_PARAM` are set for _Azure API Management_ authorization.
+Environment variable `REACT_APP_API_SUBSCRIPTION_KEY` and `REACT_APP_API_SUBSCRIPTION_KEY_PARAM` are set to GraphQL request query string for authorization gateway service.
 
 ## Run in docker
 
@@ -18,7 +18,7 @@ docker run -it \
     -p 8099:8080 \
     -e REACT_APP_API_SUBSCRIPTION_KEY=test \
     -e REACT_APP_API_SUBSCRIPTION_KEY_PARAM=digitransit-subscription-key \
-     digitransit-graphiql
+     graphiql
 ```
 
 ## Code formatting
