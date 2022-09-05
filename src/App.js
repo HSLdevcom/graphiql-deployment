@@ -78,7 +78,7 @@ const configs = [
         }
       },
       v2: {
-        title: 'Finland (otp2)',
+        title: 'Finland (v2 experimental)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'finland')
         }
