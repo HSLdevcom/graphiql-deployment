@@ -1,5 +1,5 @@
 FROM node:16-alpine3.16
-LABEL maintainer="Digitransit <digitrtransit@hsl.fi>"
+LABEL maintainer="Digitransit <digitransit@HSL.fi>"
 
 WORKDIR /opt/digitransit-graphql
 
