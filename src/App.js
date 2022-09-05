@@ -41,7 +41,7 @@ const configs = [
     router: 'waltti',
     api: {
       v1: {
-        title: 'Waltti (otp1)',
+        title: 'Waltti (v1)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'waltti'),
           prod: buildUrl('prod', VERSION_1, 'waltti')
