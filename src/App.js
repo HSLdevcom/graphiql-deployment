@@ -59,7 +59,7 @@ const configs = [
     router: 'waltti-alt',
     api: {
       v2: {
-        title: 'Waltti alt. (otp2)',
+        title: 'Waltti alt. (v2 experimental)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'waltti-alt'),
           prod: buildUrl('prod', VERSION_2, 'waltti-alt')
