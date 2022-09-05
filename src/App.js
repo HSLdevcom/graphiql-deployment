@@ -48,7 +48,7 @@ const configs = [
         }
       },
       v2: {
-        title: 'Waltti (otp2)',
+        title: 'Waltti (v2 experimental)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'waltti')
         }
