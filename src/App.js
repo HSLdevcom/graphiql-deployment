@@ -30,7 +30,7 @@ const configs = [
         }
       },
       v2: {
-        title: 'HSL (otp2)',
+        title: 'HSL (v2 experimental)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'hsl')
         }
