@@ -89,7 +89,7 @@ const configs = [
     router: 'varely',
     api: {
       v2: {
-        title: 'VARELY (otp2)',
+        title: 'VARELY (v2 experimental)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'varely')
         }
