@@ -71,7 +71,7 @@ const configs = [
     router: 'finland',
     api: {
       v1: {
-        title: 'Finland (otp1)',
+        title: 'Finland (v1)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'finland'),
           prod: buildUrl('prod', VERSION_1, 'finland')
