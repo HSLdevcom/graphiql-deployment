@@ -22,7 +22,8 @@ describe('graphQLFetcher', () => {
     it('should set URL subscription key', () => {
       const url = addSubscriptionKey(
         'https://api.example.com/graphql',
-        'secret1'
+        'secret1',
+        'subscription-key'
       );
       expect(url.pathname).toEqual('/graphql');
       expect(url.searchParams.get('subscription-key')).toEqual('secret1');
@@ -31,7 +32,8 @@ describe('graphQLFetcher', () => {
     it('should add subscription key to URL without removing existing query params', () => {
       const url = addSubscriptionKey(
         'https://api.example.com/graphql?query=my-graphql-query',
-        'secret1'
+        'secret1',
+        'subscription-key'
       );
       expect(url.pathname).toEqual('/graphql');
       expect(url.searchParams.get('query')).toEqual('my-graphql-query');
