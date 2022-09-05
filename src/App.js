@@ -23,7 +23,7 @@ const configs = [
     router: 'hsl',
     api: {
       v1: {
-        title: 'HSL (otp1)',
+        title: 'HSL (v1)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'hsl'),
           prod: buildUrl('prod', VERSION_1, 'hsl')
