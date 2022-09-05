@@ -3,11 +3,7 @@ export const buildHeaders = (headers) => ({
   'Content-Type': 'application/json'
 });
 
-export const addSubscriptionKey = (
-  apiUrl,
-  key,
-  keyParam = 'subscription-key'
-) => {
+export const addSubscriptionKey = (apiUrl, key, keyParam) => {
   const url = new URL(apiUrl);
   if (key && keyParam) {
     url.searchParams.set(keyParam, key);
@@ -23,7 +19,11 @@ export const buildRequest = (
   headers
 ) =>
   new Request(
-    addSubscriptionKey(apiUrl, subscriptionKey, subscriptionKeyParam),
+    addSubscriptionKey(
+      apiUrl,
+      subscriptionKey,
+      subscriptionKeyParam || 'subscription-key'
+    ),
     {
       method: 'post',
       headers: buildHeaders(headers),
