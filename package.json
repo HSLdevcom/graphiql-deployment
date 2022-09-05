@@ -7,7 +7,7 @@
   "private": true,
   "homepage": "/graphiql",
   "dependencies": {
-    "graphiql": "^1.9.13",
+    "graphiql": "^1.11.4",
     "graphql": "^16.5.0",
     "graphql-ws": "^5.9.1",
     "react": "^16.8.6",
