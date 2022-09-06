@@ -6,18 +6,12 @@ import { usePrettifyEditors, useHistoryContext } from '@graphiql/react';
 import 'graphiql/graphiql.css';
 
 import './fix.css';
+import graphQLFetcher from './api/graphQLFetcher';
 
 const API_TYPES = {
   prod: { label: 'Production' },
   dev: { label: 'Development' }
 };
-
-const graphQLFetcher = (apiUrl) => (graphQLParams) =>
-  fetch(apiUrl, {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(graphQLParams)
-  }).then((response) => response.json());
 
 const areConfigsEqual = (config1, config2) => {
   return config1.router === config2.router &&
@@ -162,7 +156,9 @@ const CustomGraphiQLWrapper = ({
   push,
   configs,
   config,
-  replace
+  replace,
+  subscriptionKey,
+  subscriptionKeyParam
 }) => {
   const [query, setQuery] = useState();
   const [variables, setVariables] = useState();
@@ -232,7 +228,9 @@ const CustomGraphiQLWrapper = ({
       apiType={apiType}
       config={config}
       configs={configs}
-      graphQLFetcher={graphQLFetcher}
+      graphQLFetcher={(apiUrl) =>
+        graphQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
+      }
       hasRoute={hasRoute}
       onSelectApi={onSelectApi}
       operationName={operationName}
@@ -246,23 +244,46 @@ const CustomGraphiQLWrapper = ({
   );
 };
 
-const GraphiQLRoute = withRouter(
-  ({ location, history, configs, config, isDefault = false }) => (
-    <Route
-      path={isDefault ? '/' + config.router : `/${config.router}/${config.api}`}
-      exact
-      render={() => (
-        <>
-          <CustomGraphiQLWrapper
-            location={location}
-            push={history.push}
-            replace={history.replace}
-            configs={configs}
-            config={config}
-          />
-        </>
-      )}
+const withSubscriptionKey = (Component) => (props) =>
+  (
+    <Component
+      {...props}
+      subscriptionKey={process.env.REACT_APP_API_SUBSCRIPTION_KEY}
+      subscriptionKeyParam={process.env.REACT_APP_API_SUBSCRIPTION_KEY_PARAM}
     />
+  );
+
+const GraphiQLRoute = withSubscriptionKey(
+  withRouter(
+    ({
+      location,
+      history,
+      configs,
+      config,
+      isDefault = false,
+      subscriptionKey = null,
+      subscriptionKeyParam = null
+    }) => (
+      <Route
+        path={
+          isDefault ? '/' + config.router : `/${config.router}/${config.api}`
+        }
+        exact
+        render={() => (
+          <>
+            <CustomGraphiQLWrapper
+              location={location}
+              push={history.push}
+              replace={history.replace}
+              configs={configs}
+              config={config}
+              subscriptionKey={subscriptionKey}
+              subscriptionKeyParam={subscriptionKeyParam}
+            />
+          </>
+        )}
+      />
+    )
   )
 );
 

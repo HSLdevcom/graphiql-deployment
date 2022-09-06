@@ -1,6 +1,6 @@
 {
   "name": "graphiql-deployment",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "engines": {
     "node": ">=16.16.0 <17.0.0"
   },
@@ -9,16 +9,15 @@
   "dependencies": {
     "graphiql": "^1.11.4",
     "graphql": "^16.5.0",
-    "graphql-ws": "^5.9.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "react-scripts": "^5.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=8080 react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=false",
+    "test": "react-scripts test --watchAll=false --coverage",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.js",
@@ -41,6 +40,7 @@
   },
   "devDependencies": {
     "eslint": "^8.19.0",
-    "eslint-config-react-app": "^7.0.1"
+    "eslint-config-react-app": "^7.0.1",
+    "graphql-ws": "^5.9.1"
   }
 }
