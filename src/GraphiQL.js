@@ -145,11 +145,45 @@ const PureCustomGraphiQL = ({
 const NonFlickeringCustomGraphiQL = React.memo(
   PureCustomGraphiQL,
   (props, newProps) => {
-    // Compare only apiType as the single source of truth for other properties
-    // is window.location and thus rendering is managed by wrapper component.
+    // Compare only apiType. The single source of truth for other properties
+    // is `window.location` and thus rendering is managed by wrapper component.
     return props.apiType === newProps.apiType;
   }
 );
+
+const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
+
+/**
+ * Get query from URL and provide update function for application
+ * @param {RouterLocation} location
+ */
+const useQuery = (location) => {
+  const params = new URLSearchParams(location.search);
+
+  let initial = location.search
+    ? QUERY_STRING_PARAMS.reduce(
+        (output, paramName) => ({
+          ...output,
+          [paramName]:
+            params.has(paramName) && decodeURIComponent(params.get(paramName))
+        }),
+        {}
+      )
+    : {};
+
+  const [query, setQuery] = useState(initial.query);
+  const [variables, setVariables] = useState(initial.variables);
+  const [operationName, setOperationName] = useState(initial.operationName);
+
+  return {
+    query,
+    variables,
+    operationName,
+    setQuery,
+    setVariables,
+    setOperationName
+  };
+};
 
 const CustomGraphiQLWrapper = ({
   location,
@@ -160,9 +194,15 @@ const CustomGraphiQLWrapper = ({
   subscriptionKey,
   subscriptionKeyParam
 }) => {
-  const [query, setQuery] = useState();
-  const [variables, setVariables] = useState();
-  const [operationName, setOperationName] = useState();
+  const {
+    query,
+    variables,
+    operationName,
+    setQuery,
+    setVariables,
+    setOperationName
+  } = useQuery(location);
+
   const [apiType, setApiType] = useState(
     (!!location.state && location.state.apiType) ||
       (window.location.hostname === 'api.digitransit.fi' ? 'prod' : 'dev')
@@ -172,31 +212,6 @@ const CustomGraphiQLWrapper = ({
     const queryString = getQueryString(query, variables, operationName);
     replace(queryString);
   }, [replace, query, variables, operationName]);
-
-  useEffect(
-    (location) => {
-      if (!location) {
-        return;
-      }
-
-      const urlSearchParams = new URLSearchParams(location.search);
-
-      const query =
-        urlSearchParams.has('query') &&
-        decodeURIComponent(urlSearchParams.get('query'));
-      const variables =
-        urlSearchParams.has('variables') &&
-        decodeURIComponent(urlSearchParams.get('variables'));
-      const operationName =
-        urlSearchParams.has('operationName') &&
-        decodeURIComponent(urlSearchParams.get('operationName'));
-
-      setQuery(query);
-      setVariables(variables);
-      setOperationName(operationName);
-    },
-    [location]
-  );
 
   const hasRoute = (router, api, apiType) =>
     Boolean(
