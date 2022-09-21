@@ -91,7 +91,8 @@ const configs = [
       v2: {
         title: 'VARELY (v2 experimental)',
         routerUrl: {
-          dev: buildUrl('dev', VERSION_2, 'varely')
+          dev: buildUrl('dev', VERSION_2, 'varely'),
+          prod: buildUrl('prod', VERSION_2, 'varely')
         }
       }
     }
