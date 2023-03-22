@@ -191,8 +191,9 @@ const CustomGraphiQLWrapper = ({
   configs,
   config,
   replace,
-  subscriptionKey,
-  subscriptionKeyParam
+  prodSubscriptionKey,
+  subscriptionKeyParam,
+  devSubscriptionKey
 }) => {
   const {
     query,
@@ -237,6 +238,8 @@ const CustomGraphiQLWrapper = ({
     });
   };
 
+  const subscriptionKey = apiType === 'prod' ? prodSubscriptionKey : devSubscriptionKey;
+  
   return (
     <NonFlickeringCustomGraphiQL
       alert={alert}
@@ -263,7 +266,8 @@ const withSubscriptionKey = (Component) => (props) =>
   (
     <Component
       {...props}
-      subscriptionKey={process.env.REACT_APP_API_SUBSCRIPTION_KEY}
+      prodSubscriptionKey={process.env.REACT_APP_API_SUBSCRIPTION_KEY}
+      devSubscriptionKey={process.env.REACT_APP_DEV_API_SUBSCRIPTION_KEY}
       subscriptionKeyParam={process.env.REACT_APP_API_SUBSCRIPTION_KEY_PARAM}
     />
   );
@@ -276,8 +280,9 @@ const GraphiQLRoute = withSubscriptionKey(
       configs,
       config,
       isDefault = false,
-      subscriptionKey = null,
-      subscriptionKeyParam = null
+      prodSubscriptionKey = null,
+      subscriptionKeyParam = null,
+      devSubscriptionKey = null,
     }) => (
       <Route
         path={
@@ -292,8 +297,9 @@ const GraphiQLRoute = withSubscriptionKey(
               replace={history.replace}
               configs={configs}
               config={config}
-              subscriptionKey={subscriptionKey}
+              prodSubscriptionKey={prodSubscriptionKey}
               subscriptionKeyParam={subscriptionKeyParam}
+              devSubscriptionKey={devSubscriptionKey}
             />
           </>
         )}

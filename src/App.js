@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect } from 'react-router-dom';
 
 import GraphiQL from './GraphiQL';
 
@@ -32,7 +32,8 @@ const configs = [
       v2: {
         title: 'HSL (v2 experimental)',
         routerUrl: {
-          dev: buildUrl('dev', VERSION_2, 'hsl')
+          dev: buildUrl('dev', VERSION_2, 'hsl'),
+          prod: buildUrl('prod', VERSION_2, 'hsl')
         }
       }
     }
@@ -50,7 +51,8 @@ const configs = [
       v2: {
         title: 'Waltti (v2 experimental)',
         routerUrl: {
-          dev: buildUrl('dev', VERSION_2, 'waltti')
+          dev: buildUrl('dev', VERSION_2, 'waltti'),
+          prod: buildUrl('prod', VERSION_2, 'waltti')
         }
       }
     }
@@ -80,7 +82,8 @@ const configs = [
       v2: {
         title: 'Finland (v2 experimental)',
         routerUrl: {
-          dev: buildUrl('dev', VERSION_2, 'finland')
+          dev: buildUrl('dev', VERSION_2, 'finland'),
+          prod: buildUrl('prod', VERSION_2, 'finland')
         }
       }
     }
@@ -104,6 +107,7 @@ export default class App extends React.Component {
     return (
       <Router basename="/graphiql">
         <GraphiQL configObjs={configs} />
+        <Redirect to="/hsl"/>
       </Router>
     );
   }
