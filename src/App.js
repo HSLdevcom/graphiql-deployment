@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 import GraphiQL from './GraphiQL';
 
@@ -107,7 +107,9 @@ export default class App extends React.Component {
     return (
       <Router basename="/graphiql">
         <GraphiQL configObjs={configs} />
-        <Redirect to="/hsl"/>
+        <Route path="/" exact>
+          <Redirect to="/hsl" />
+        </Route>
       </Router>
     );
   }
