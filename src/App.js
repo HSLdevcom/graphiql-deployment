@@ -23,7 +23,7 @@ const configs = [
     router: 'hsl',
     api: {
       v1: {
-        title: 'HSL (v1)',
+        title: 'HSL (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'hsl'),
           prod: buildUrl('prod', VERSION_1, 'hsl')
@@ -42,7 +42,7 @@ const configs = [
     router: 'waltti',
     api: {
       v1: {
-        title: 'Waltti (v1)',
+        title: 'Waltti (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'waltti'),
           prod: buildUrl('prod', VERSION_1, 'waltti')
@@ -73,7 +73,7 @@ const configs = [
     router: 'finland',
     api: {
       v1: {
-        title: 'Finland (v1)',
+        title: 'Finland (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'finland'),
           prod: buildUrl('prod', VERSION_1, 'finland')
