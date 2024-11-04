@@ -23,14 +23,14 @@ const configs = [
     router: 'hsl',
     api: {
       v1: {
-        title: 'HSL (v1)',
+        title: 'HSL (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'hsl'),
           prod: buildUrl('prod', VERSION_1, 'hsl')
         }
       },
       v2: {
-        title: 'HSL (v2 experimental)',
+        title: 'HSL (v2)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'hsl'),
           prod: buildUrl('prod', VERSION_2, 'hsl')
@@ -42,14 +42,14 @@ const configs = [
     router: 'waltti',
     api: {
       v1: {
-        title: 'Waltti (v1)',
+        title: 'Waltti (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'waltti'),
           prod: buildUrl('prod', VERSION_1, 'waltti')
         }
       },
       v2: {
-        title: 'Waltti (v2 experimental)',
+        title: 'Waltti (v2)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'waltti'),
           prod: buildUrl('prod', VERSION_2, 'waltti')
@@ -61,7 +61,7 @@ const configs = [
     router: 'waltti-alt',
     api: {
       v2: {
-        title: 'Waltti alt. (v2 experimental)',
+        title: 'Waltti alt. (v2)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'waltti-alt'),
           prod: buildUrl('prod', VERSION_2, 'waltti-alt')
@@ -73,14 +73,14 @@ const configs = [
     router: 'finland',
     api: {
       v1: {
-        title: 'Finland (v1)',
+        title: 'Finland (v1 Deprecated)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_1, 'finland'),
           prod: buildUrl('prod', VERSION_1, 'finland')
         }
       },
       v2: {
-        title: 'Finland (v2 experimental)',
+        title: 'Finland (v2)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'finland'),
           prod: buildUrl('prod', VERSION_2, 'finland')
@@ -92,7 +92,7 @@ const configs = [
     router: 'varely',
     api: {
       v2: {
-        title: 'VARELY (v2 experimental)',
+        title: 'VARELY (v2)',
         routerUrl: {
           dev: buildUrl('dev', VERSION_2, 'varely'),
           prod: buildUrl('prod', VERSION_2, 'varely')
