@@ -8,6 +8,8 @@ import 'graphiql/graphiql.css';
 import './fix.css';
 import graphQLFetcher from './api/graphQLFetcher';
 
+import { API_VERSION_2, DIALECT_VERSION_1 } from './App';
+
 const API_TYPES = {
   prod: { label: 'Production' },
   dev: { label: 'Development' }
@@ -224,15 +226,9 @@ const CustomGraphiQLWrapper = ({
       )
     );
 
-  const getDefaultRouter = (router) => getDefaultApi(configs, router).router;
-
   const onSelectApi = (router, api) => {
-    const pathname = hasRoute(router, api, apiType)
-      ? `/${router}/${api}`
-      : '/' + getDefaultRouter(router);
-
     push({
-      pathname,
+      pathname: getPath(!hasRoute(router, api, apiType), router, api),
       search: getQueryString(query, variables, operationName),
       state: { apiType: apiType }
     });
@@ -285,9 +281,7 @@ const GraphiQLRoute = withSubscriptionKey(
       devSubscriptionKey = null,
     }) => (
       <Route
-        path={
-          isDefault ? '/' + config.router : `/${config.router}/${config.api}`
-        }
+        path={getPath(isDefault, config.router, config.api)}
         exact
         render={() => (
           <>
@@ -308,45 +302,84 @@ const GraphiQLRoute = withSubscriptionKey(
   )
 );
 
-const parseConfig = (configObjs) =>
-  configObjs.reduce(
+const parseConfig = (configs) =>
+  configs.reduce(
     (acc, config) =>
       Object.entries(config.api).reduce(
-        (acc, [apiName, configApi]) => [
-          ...acc,
-          {
-            ...configApi,
-            api: apiName,
-            router: config.router
-          }
-        ],
+        (acc, [apiVersion, apiConfig]) =>
+          apiVersion === API_VERSION_2 ?
+            Object.entries(apiConfig.dialect).reduce(
+              (acc, [dialectName, dialectNameConfig]) =>
+                Object.entries(dialectNameConfig).reduce(
+                  (acc, [dialectVersion, dialectConfig]) => [
+                    ...acc,
+                    {
+                      ...dialectConfig,
+                      apiVersion: apiVersion,
+                      router: config.router,
+                      dialect: dialectName,
+                      dialectVersion: dialectVersion
+                    }
+                  ],
+                  acc
+                ),
+                acc
+            ) :
+            [
+              ...acc,
+              {
+                ...apiConfig,
+                apiVersion: apiVersion,
+                router: config.router,
+                dialect: null,
+                dialectVersion: null
+              }
+            ],
         acc
       ),
     []
   );
 
-const getDefaultApi = (configs, router) => {
-  return configs.find((config) => config.router === router);
+const getDefaultApi = (configs, router, apiVersion, dialect, dialectVersion) => {
+  return apiVersion === API_VERSION_2 ?
+    configs.find((config) =>
+      config.router === router &&
+      config.apiVersion === apiVersion &&
+      config.dialect === dialect &&
+      config.dialectVersion === dialectVersion
+    ) :
+    configs.find((config) =>
+      config.router === router &&
+      config.apiVersion === apiVersion
+    )
 };
 
-const GraphiQLRoutes = ({ configObjs }) => {
-  // build config list for toolbar selectors
-  const configs = useMemo(() => parseConfig(configObjs), [configObjs]);
+const getPath = (isDefault, router, apiVersion, dialect, dialectVersion) => {
+  return isDefault ?
+    `/${router}` : 
+    apiVersion === API_VERSION_2 ?
+      `/${router}/${apiVersion}/${dialect}/${dialectVersion}` :
+      `/${router}/${apiVersion}`
+}
 
-  const routes = configs.map((config) => (
+const GraphiQLRoutes = ({ configs }) => {
+  // build config list for toolbar selectors
+  const parsedConfigs = useMemo(() => parseConfig(configs), [configs]);
+
+  const routes = parsedConfigs.map((config) => (
     <GraphiQLRoute
       key={`${config.router}:${config.api}`}
-      configs={configs}
+      configs={parsedConfigs}
       config={config}
     />
   ));
 
-  // default route is route without api version (eg. /hsl --> /hsl/v1)
-  const defaultRoutes = configObjs.map((configObj) => (
+  // the default route is a route without the api version (eg. /hsl --> /hsl/v2)
+  const defaultRoutes = configs.map((config) => (
     <GraphiQLRoute
-      key={`${configObj.router}`}
-      configs={configs}
-      config={getDefaultApi(configs, configObj.router)}
+      key={`${config.router}`}
+      configs={parsedConfigs}
+      config={getDefaultApi(parsedConfigs, config.router, API_VERSION_2, 'gtfs', DIALECT_VERSION_1)}
       isDefault
     />
   ));
