@@ -2,14 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 import GraphiQL from './GraphiQL';
-
-export const API_VERSION_1 = 'v1';
-export const API_VERSION_2 = 'v2';
-export const DIALECT_VERSION_1 = 'v1';
+import { API_VERSION_1, API_VERSION_2, DIALECT_VERSION_1, API_TYPE, API_CONFIG } from './constants';
 
 /**
- *
- * @param {String} apiType 'dev' or 'prod'
+ * @param {String} apiType API_TYPE.DEV or API_TYPE.PROD
  * @param {String} apiVersion 'v1' or 'v2'
  * @param {String} router router name (eg. 'hsl', 'waltti', ...)
  * @param {String} dialect api dialect (eg. 'gtfs' or 'transmodel')
@@ -19,8 +15,8 @@ export const DIALECT_VERSION_1 = 'v1';
 const buildUrl = (apiType, apiVersion, router, dialect, dialectVersion) => {
   const apiPath = apiVersion === API_VERSION_1 ? `routers/${router}/index/graphql` : `${router}/${dialect}/${dialectVersion}`;
   return `https://${
-    apiType === 'dev' ? 'dev-api' : 'api'
-  }.digitransit.fi/routing/${apiVersion}/${apiPath}`;
+    apiType === API_TYPE.DEV ? API_CONFIG[API_TYPE.DEV].URL : API_CONFIG[API_TYPE.PROD].URL
+  }/routing/${apiVersion}/${apiPath}`;
 }
 
 const configs = [
@@ -30,8 +26,8 @@ const configs = [
       [API_VERSION_1]: {
         title: 'HSL (v1 Deprecated)',
         routerUrl: {
-          dev: buildUrl('dev', API_VERSION_1, 'hsl'),
-          prod: buildUrl('prod', API_VERSION_1, 'hsl')
+          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'hsl'),
+          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'hsl')
         }
       },
       [API_VERSION_2]: {
@@ -42,8 +38,8 @@ const configs = [
               default: true,
               title: 'GTFS (v1)',
               routerUrl: {
-                dev: buildUrl('dev', API_VERSION_2, 'hsl', 'gtfs', DIALECT_VERSION_1),
-                prod: buildUrl('prod', API_VERSION_2, 'hsl', 'gtfs', DIALECT_VERSION_1)
+                [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_2, 'hsl', 'gtfs', DIALECT_VERSION_1),
+                [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_2, 'hsl', 'gtfs', DIALECT_VERSION_1)
               }
             }
           }
@@ -57,8 +53,8 @@ const configs = [
       [API_VERSION_1]: {
         title: 'Waltti (v1 Deprecated)',
         routerUrl: {
-          dev: buildUrl('dev', API_VERSION_1, 'waltti'),
-          prod: buildUrl('prod', API_VERSION_1, 'waltti')
+          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'waltti'),
+          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'waltti')
         }
       },
       [API_VERSION_2]: {
@@ -69,8 +65,8 @@ const configs = [
               default: true,
               title: 'GTFS (v1)',
               routerUrl: {
-                dev: buildUrl('dev', API_VERSION_2, 'waltti', 'gtfs', DIALECT_VERSION_1),
-                prod: buildUrl('prod', API_VERSION_2, 'waltti', 'gtfs', DIALECT_VERSION_1)
+                [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_2, 'waltti', 'gtfs', DIALECT_VERSION_1),
+                [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_2, 'waltti', 'gtfs', DIALECT_VERSION_1)
               }
             }
           }
@@ -89,8 +85,8 @@ const configs = [
               default: true,
               title: 'GTFS (v1)',
               routerUrl: {
-                dev: buildUrl('dev', API_VERSION_2, 'waltti-alt', 'gtfs', DIALECT_VERSION_1),
-                prod: buildUrl('prod', API_VERSION_2, 'waltti-alt', 'gtfs', DIALECT_VERSION_1)
+                [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_2, 'waltti-alt', 'gtfs', DIALECT_VERSION_1),
+                [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_2, 'waltti-alt', 'gtfs', DIALECT_VERSION_1)
               }
             }
           }
@@ -104,8 +100,8 @@ const configs = [
       [API_VERSION_1]: {
         title: 'Finland (v1 Deprecated)',
         routerUrl: {
-          dev: buildUrl('dev', API_VERSION_1, 'finland'),
-          prod: buildUrl('prod', API_VERSION_1, 'finland')
+          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'finland'),
+          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'finland')
         }
       },
       [API_VERSION_2]: {
@@ -116,8 +112,8 @@ const configs = [
               default: true,
               title: 'GTFS (v1)',
               routerUrl: {
-                dev: buildUrl('dev', API_VERSION_2, 'finland', 'gtfs', DIALECT_VERSION_1),
-                prod: buildUrl('prod', API_VERSION_2, 'finland', 'gtfs', DIALECT_VERSION_1)
+                [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_2, 'finland', 'gtfs', DIALECT_VERSION_1),
+                [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_2, 'finland', 'gtfs', DIALECT_VERSION_1)
               }
             }
           }
@@ -136,8 +132,8 @@ const configs = [
               default: true,
               title: 'GTFS (v1)',
               routerUrl: {
-                dev: buildUrl('dev', API_VERSION_2, 'varely', 'gtfs', DIALECT_VERSION_1),
-                prod: buildUrl('prod', API_VERSION_2, 'varely', 'gtfs', DIALECT_VERSION_1)
+                [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_2, 'varely', 'gtfs', DIALECT_VERSION_1),
+                [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_2, 'varely', 'gtfs', DIALECT_VERSION_1)
               }
             }
           }

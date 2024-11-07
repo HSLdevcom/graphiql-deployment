@@ -8,18 +8,13 @@ import 'graphiql/graphiql.css';
 import './fix.css';
 import graphQLFetcher from './api/graphQLFetcher';
 
-import { API_VERSION_2, DIALECT_VERSION_1 } from './App';
-
-const API_TYPES = {
-  prod: { label: 'Production' },
-  dev: { label: 'Development' }
-};
+import { API_VERSION_2, DIALECT_VERSION_1, API_TYPE, API_CONFIG, PRODUCTION_API_URL } from './constants';
 
 const areConfigsEqual = (config1, config2) => {
   return config1.router === config2.router &&
-    Boolean(config1.api) &&
-    Boolean(config2.api)
-    ? config1.api === config2.api
+    Boolean(config1.apiVersion) &&
+    Boolean(config2.apiVersion)
+    ? config1.apiVersion === config2.apiVersion
     : true;
 };
 
@@ -105,11 +100,11 @@ const PureCustomGraphiQL = ({
           .filter((it) => Boolean(it.routerUrl[apiType]))
           .map((it) => (
             <GraphiQL.MenuItem
-              key={it.router + ':' + it.api}
+              key={it.router + ':' + it.apiVersion}
               title={it.title}
               label={it.title}
               selected={areConfigsEqual(it, config)}
-              onSelect={() => onSelectApi(it.router, it.api)}
+              onSelect={() => onSelectApi(it.router, it.apiVersion)}
             />
           ))}
       </GraphiQL.Menu>
@@ -120,20 +115,20 @@ const PureCustomGraphiQL = ({
         API version:
       </span>
       <GraphiQL.Menu
-        label={apiType ? API_TYPES[apiType].label : 'API version'}
+        label={apiType ? API_CONFIG[apiType].label : 'API version'}
         title="Change API version">
-        {['prod', 'dev'].map((type) => (
+        {Object.entries(API_CONFIG).map(([elementApiType, elementApiConfig]) => (
           <GraphiQL.MenuItem
-            key={type}
-            title={API_TYPES[type].label}
-            label={API_TYPES[type].label}
-            selected={apiType === type}
+            key={elementApiType}
+            title={elementApiConfig.label}
+            label={elementApiConfig.label}
+            selected={apiType === elementApiType}
             onSelect={() => {
-              if (hasRoute(config.router, config.api, type)) {
-                setApiType(type);
+              if (hasRoute(config.router, config.apiVersion, elementApiType)) {
+                setApiType(elementApiType);
               } else {
                 alert(
-                  `No endpoint exists for API version: ${API_TYPES[type].label}`
+                  `No endpoint exists for API version: ${elementApiConfig.label}`
                 );
               }
             }}
@@ -208,7 +203,7 @@ const CustomGraphiQLWrapper = ({
 
   const [apiType, setApiType] = useState(
     (!!location.state && location.state.apiType) ||
-      (window.location.hostname === 'api.digitransit.fi' ? 'prod' : 'dev')
+      (window.location.hostname === PRODUCTION_API_URL ? API_TYPE.PROD : API_TYPE.DEV)
   );
 
   useEffect(() => {
@@ -216,12 +211,12 @@ const CustomGraphiQLWrapper = ({
     replace(queryString);
   }, [replace, query, variables, operationName]);
 
-  const hasRoute = (router, api, apiType) =>
+  const hasRoute = (router, apiVersion, apiType) =>
     Boolean(
       configs.find(
         (config) =>
           config.router === router &&
-          config.api === api &&
+          config.apiVersion === apiVersion &&
           config.routerUrl[apiType]
       )
     );
@@ -234,7 +229,7 @@ const CustomGraphiQLWrapper = ({
     });
   };
 
-  const subscriptionKey = apiType === 'prod' ? prodSubscriptionKey : devSubscriptionKey;
+  const subscriptionKey = apiType === API_TYPE.PROD ? prodSubscriptionKey : devSubscriptionKey;
   
   return (
     <NonFlickeringCustomGraphiQL
@@ -281,7 +276,7 @@ const GraphiQLRoute = withSubscriptionKey(
       devSubscriptionKey = null,
     }) => (
       <Route
-        path={getPath(isDefault, config.router, config.api)}
+        path={getPath(isDefault, config.router, config.apiVersion)}
         exact
         render={() => (
           <>
@@ -318,7 +313,8 @@ const parseConfig = (configs) =>
                       apiVersion: apiVersion,
                       router: config.router,
                       dialect: dialectName,
-                      dialectVersion: dialectVersion
+                      dialectVersion: dialectVersion,
+                      title: `${apiConfig.title} - ${dialectConfig.title}`
                     }
                   ],
                   acc
@@ -368,7 +364,7 @@ const GraphiQLRoutes = ({ configs }) => {
 
   const routes = parsedConfigs.map((config) => (
     <GraphiQLRoute
-      key={`${config.router}:${config.api}`}
+      key={`${config.router}:${config.apiVersion}`}
       configs={parsedConfigs}
       config={config}
     />
