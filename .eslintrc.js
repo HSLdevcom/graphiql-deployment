@@ -1,4 +1,5 @@
 module.exports = {
+  parser: '@babel/eslint-parser',
   extends: [
     'plugin:compat/recommended',
     'plugin:jsx-a11y/recommended',
@@ -28,6 +29,7 @@ module.exports = {
     'react/state-in-constructor': 'off',
     'react/static-property-placement': 'off',
     'react/function-component-definition': 'off',
+    'react/prop-types': 'off',
 
     // jsx-a11y
     'jsx-a11y/anchor-is-valid': [
@@ -55,12 +57,15 @@ module.exports = {
         trailingComma: 'all',
       },
     ],
+
+    'no-shadow': 'off',
   },
   env: {
     browser: true,
+    jest: true,
   },
   plugins: ['react', 'compat', 'prettier', 'jsx-a11y'],
   settings: {
     polyfills: ['fetch', 'promises'],
-  }
+  },
 };

@@ -1,7 +1,7 @@
 import {
   addSubscriptionKey,
   buildHeaders,
-  buildRequest
+  buildRequest,
 } from './graphQLFetcher';
 
 describe('graphQLFetcher', () => {
@@ -23,7 +23,7 @@ describe('graphQLFetcher', () => {
       const url = addSubscriptionKey(
         'https://api.example.com/graphql',
         'secret1',
-        'subscription-key'
+        'subscription-key',
       );
       expect(url.pathname).toEqual('/graphql');
       expect(url.searchParams.get('subscription-key')).toEqual('secret1');
@@ -33,7 +33,7 @@ describe('graphQLFetcher', () => {
       const url = addSubscriptionKey(
         'https://api.example.com/graphql?query=my-graphql-query',
         'secret1',
-        'subscription-key'
+        'subscription-key',
       );
       expect(url.pathname).toEqual('/graphql');
       expect(url.searchParams.get('query')).toEqual('my-graphql-query');
@@ -47,12 +47,12 @@ describe('graphQLFetcher', () => {
         'https://api.example.com/graphql',
         'secret1',
         'subscription-key',
-        '{feed{feedId}}'
+        '{feed{feedId}}',
       );
       expect(req instanceof Request).toBeTruthy();
       expect(req.method).toEqual('POST');
       expect(req.url).toEqual(
-        'https://api.example.com/graphql?subscription-key=secret1'
+        'https://api.example.com/graphql?subscription-key=secret1',
       );
     });
   });
