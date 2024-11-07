@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Route, withRouter } from 'react-router-dom';
 
 import GraphiQL from 'graphiql';
-import { usePrettifyEditors, useHistoryContext } from '@graphiql/react';
+import { usePrettifyEditors, useHistoryContext, ToolbarMenu } from '@graphiql/react';
 import 'graphiql/graphiql.css';
 
 import './fix.css';
@@ -32,7 +32,7 @@ const PrettifyButton = () => {
   const prettify = usePrettifyEditors();
 
   return (
-    <GraphiQL.ToolbarButton
+    <GraphiQL.Button
       onClick={prettify}
       title="Prettify Query (Shift-Ctrl-P)"
       label="Prettify"
@@ -43,7 +43,7 @@ const PrettifyButton = () => {
 const ToggleHistoryButton = () => {
   const historyCtx = useHistoryContext();
   return (
-    <GraphiQL.ToolbarButton
+    <GraphiQL.Button
       onClick={() => historyCtx?.toggle()}
       title="Show History"
       label="History"
@@ -93,13 +93,13 @@ const PureCustomGraphiQL = ({
         }}>
         Endpoint:
       </span>
-      <GraphiQL.Menu
+      <ToolbarMenu
         label={config.title || 'Endpoint'}
         title="Change GraphQL endpoint">
         {configs
           .filter((it) => Boolean(it.routerUrl[apiType]))
           .map((it) => (
-            <GraphiQL.MenuItem
+            <ToolbarMenu.Item
               key={it.router + ':' + it.apiVersion}
               title={it.title}
               label={it.title}
@@ -107,18 +107,18 @@ const PureCustomGraphiQL = ({
               onSelect={() => onSelectApi(it.router, it.apiVersion)}
             />
           ))}
-      </GraphiQL.Menu>
+      </ToolbarMenu>
       <span
         style={{
           paddingTop: 3
         }}>
         API version:
       </span>
-      <GraphiQL.Menu
+      <ToolbarMenu
         label={apiType ? API_CONFIG[apiType].label : 'API version'}
         title="Change API version">
         {Object.entries(API_CONFIG).map(([elementApiType, elementApiConfig]) => (
-          <GraphiQL.MenuItem
+          <ToolbarMenu.Item
             key={elementApiType}
             title={elementApiConfig.label}
             label={elementApiConfig.label}
@@ -134,7 +134,7 @@ const PureCustomGraphiQL = ({
             }}
           />
         ))}
-      </GraphiQL.Menu>
+      </ToolbarMenu>
     </GraphiQL.Toolbar>
   </GraphiQL>
 );
