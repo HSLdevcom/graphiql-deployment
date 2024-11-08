@@ -1,6 +1,6 @@
-export const buildHeaders = (headers) => ({
+export const buildHeaders = headers => ({
   ...(headers instanceof Object ? headers : {}),
-  'Content-Type': 'application/json'
+  'Content-Type': 'application/json',
 });
 
 export const addSubscriptionKey = (apiUrl, key, keyParam) => {
@@ -16,19 +16,19 @@ export const buildRequest = (
   subscriptionKey,
   subscriptionKeyParam,
   graphQLParams,
-  headers
+  headers,
 ) =>
   new Request(
     addSubscriptionKey(
       apiUrl,
       subscriptionKey,
-      subscriptionKeyParam || 'subscription-key'
+      subscriptionKeyParam || 'subscription-key',
     ),
     {
       method: 'post',
       headers: buildHeaders(headers),
-      body: JSON.stringify(graphQLParams)
-    }
+      body: JSON.stringify(graphQLParams),
+    },
   );
 
 const graphQLFetcher =
@@ -40,8 +40,8 @@ const graphQLFetcher =
         subscriptionKey,
         subscriptionKeyParam,
         graphQLParams,
-        headers
-      )
-    ).then((response) => response.json());
+        headers,
+      ),
+    ).then(response => response.json());
 
 export default graphQLFetcher;
