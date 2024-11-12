@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GraphiQL from 'graphiql';
 import { ToolbarButton, ToolbarMenu } from '@graphiql/react';
-import graphQLFetcher from './api/graphQLFetcher';
+import graphQLFetcher from '../api/graphQLFetcher';
 import 'graphiql/graphiql.css';
 
 import { hasRoute, getPath, getQueryString } from './utils';
-import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from './config';
+import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
   config,

@@ -2,9 +2,9 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 
 import { API_VERSION_1, API_VERSION_2 } from './config';
-import DefaultApiRoute from './DefaultApiRoute';
-import Version1ApiRoute from './Version1ApiRoute';
-import Version2ApiRoute from './Version2ApiRoute';
+import DefaultApiRoute from './graphiql/DefaultApiRoute';
+import Version1ApiRoute from './graphiql/Version1ApiRoute';
+import Version2ApiRoute from './graphiql/Version2ApiRoute';
 
 export default () => {
   return (

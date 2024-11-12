@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { API_VERSION_2, DIALECT_VERSION_1, CONFIG_LIST } from './config';
+import { API_VERSION_2, DIALECT_VERSION_1, CONFIG_LIST } from '../config';
 import { getApiConfig } from './utils';
 import CustomGraphiQL from './CustomGraphiQL';
 

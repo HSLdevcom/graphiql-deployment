@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { API_VERSION_2 } from './config';
+import { API_VERSION_2 } from '../config';
 
 export function getApiConfig(
   configList,
