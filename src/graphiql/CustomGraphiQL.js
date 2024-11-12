@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GraphiQL from 'graphiql';
-import { ToolbarButton, ToolbarMenu } from '@graphiql/react';
+import { ToolbarMenu } from '@graphiql/react';
 import graphQLFetcher from '../api/graphQLFetcher';
 import 'graphiql/graphiql.css';
+import './CustomGraphiQL.css';
 
 import { hasRoute, getPath, getQueryString } from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
@@ -35,7 +36,7 @@ const GraphiQLWithCustomToolbar = ({
       additionalContent: (
         <>
           <ToolbarMenu
-            button={<ToolbarButton>EP</ToolbarButton>}
+            button={<div className="customgraphiql-toolbarmenu-button">EP</div>}
             label={`Endpoint: ${config.title}`}>
             {configList
               .filter(configItem => Boolean(configItem.routerUrl[apiType]))
@@ -55,7 +56,9 @@ const GraphiQLWithCustomToolbar = ({
               ))}
           </ToolbarMenu>
           <ToolbarMenu
-            button={<ToolbarButton>API</ToolbarButton>}
+            button={
+              <div className="customgraphiql-toolbarmenu-button">API</div>
+            }
             label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
             {Object.entries(API_CONFIG).map(
               ([elementApiType, elementApiConfig]) => (
