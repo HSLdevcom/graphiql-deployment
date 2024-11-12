@@ -1,51 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GraphiQL from 'graphiql';
-import { ToolbarMenu } from '@graphiql/react';
+import { ToolbarButton, ToolbarMenu } from '@graphiql/react';
 import graphQLFetcher from './api/graphQLFetcher';
 import 'graphiql/graphiql.css';
 
-import { hasRoute } from './utils';
-import {
-  API_VERSION_2,
-  API_CONFIG,
-  PRODUCTION_API_URL,
-  API_TYPE,
-} from './config';
+import { hasRoute, getPath, getQueryString } from './utils';
+import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from './config';
 
-const areConfigsEqual = (config1, config2) => {
-  return config1.router === config2.router &&
-    Boolean(config1.api) &&
-    Boolean(config2.api)
-    ? config1.api === config2.api
-    : true;
-};
-
-const getQueryString = (query, variables, operationName) => {
-  const urlSearchParams = new URLSearchParams();
-  if (query) {
-    urlSearchParams.set('query', encodeURIComponent(query));
-  }
-  if (variables) {
-    urlSearchParams.set('variables', encodeURIComponent(variables));
-  }
-  if (operationName) {
-    urlSearchParams.set('operationName', encodeURIComponent(operationName));
-  }
-  return `?${urlSearchParams.toString()}`;
-};
-
-const getPath = (isDefault, router, apiVersion, dialect, dialectVersion) => {
-  if (isDefault) {
-    return `/${router}`;
-  }
-
-  return apiVersion === API_VERSION_2
-    ? `/${router}/${apiVersion}/${dialect}/${dialectVersion}`
-    : `/${router}/${apiVersion}`;
-};
-
-const PureCustomGraphiQL = ({
+const GraphiQLWithCustomToolbar = ({
   config,
   configList,
   graphQLFetcher,
@@ -67,76 +30,64 @@ const PureCustomGraphiQL = ({
     operationName={operationName || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
-    onEditOperationName={operationName => setOperationName(operationName)}>
-    <GraphiQL.Toolbar>
-      <span
-        style={{
-          paddingTop: 3,
-        }}>
-        Endpoint:
-      </span>
-      <ToolbarMenu
-        label={config.title || 'Endpoint'}
-        title="Change GraphQL endpoint">
-        {configList
-          .filter(it => Boolean(it.routerUrl[apiType]))
-          .map(it => (
-            <ToolbarMenu.Item
-              key={`${it.router}:${it.apiVersion}`}
-              title={it.title}
-              label={it.title}
-              selected={areConfigsEqual(it, config)}
-              onSelect={() =>
-                onSelectApi(
-                  it.router,
-                  it.apiVersion,
-                  it.dialect,
-                  it.dialectVersion,
-                )
-              }
-            />
-          ))}
-      </ToolbarMenu>
-      <span
-        style={{
-          paddingTop: 3,
-        }}>
-        API version:
-      </span>
-      <ToolbarMenu
-        label={apiType ? API_CONFIG[apiType].label : 'API version'}
-        title="Change API version">
-        {Object.entries(API_CONFIG).map(
-          ([elementApiType, elementApiConfig]) => (
-            <ToolbarMenu.Item
-              key={elementApiType}
-              title={elementApiConfig.label}
-              label={elementApiConfig.label}
-              selected={apiType === elementApiType}
-              onSelect={() => {
-                if (
-                  hasRoute(
-                    configList,
-                    config.router,
-                    config.apiVersion,
-                    config.dialect,
-                    config.dialectVersion,
-                    elementApiType,
-                  )
-                ) {
-                  setApiType(elementApiType);
-                } else {
-                  alert(
-                    `No endpoint exists for API version: ${elementApiConfig.label}`,
-                  );
-                }
-              }}
-            />
-          ),
-        )}
-      </ToolbarMenu>
-    </GraphiQL.Toolbar>
-  </GraphiQL>
+    onEditOperationName={operationName => setOperationName(operationName)}
+    toolbar={{
+      additionalContent: (
+        <>
+          <ToolbarMenu
+            button={<ToolbarButton>EP</ToolbarButton>}
+            label={`Endpoint: ${config.title}`}>
+            {configList
+              .filter(configItem => Boolean(configItem.routerUrl[apiType]))
+              .map(configItem => (
+                <ToolbarMenu.Item
+                  key={`${configItem.router}:${configItem.apiVersion}`}
+                  onSelect={() =>
+                    onSelectApi(
+                      configItem.router,
+                      configItem.apiVersion,
+                      config.dialect,
+                      config.dialectVersion,
+                    )
+                  }>
+                  {configItem.title}
+                </ToolbarMenu.Item>
+              ))}
+          </ToolbarMenu>
+          <ToolbarMenu
+            button={<ToolbarButton>API</ToolbarButton>}
+            label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+            {Object.entries(API_CONFIG).map(
+              ([elementApiType, elementApiConfig]) => (
+                <ToolbarMenu.Item
+                  key={elementApiType}
+                  onSelect={() => {
+                    if (
+                      hasRoute(
+                        configList,
+                        config.router,
+                        config.apiVersion,
+                        config.dialect,
+                        config.dialectVersion,
+                        elementApiType,
+                      )
+                    ) {
+                      setApiType(elementApiType);
+                    } else {
+                      alert(
+                        `No endpoint exists for API version: ${elementApiConfig.label}`,
+                      );
+                    }
+                  }}>
+                  {elementApiConfig.label}
+                </ToolbarMenu.Item>
+              ),
+            )}
+          </ToolbarMenu>
+        </>
+      ),
+    }}
+  />
 );
 
 const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
@@ -192,7 +143,7 @@ const CustomGraphiQLWrapper = ({
   } = useQuery(location);
 
   const [apiType, setApiType] = useState(
-    (!!location.state && location.state.apiType) ||
+    location.state?.apiType ||
       (window.location.hostname === PRODUCTION_API_URL
         ? API_TYPE.PROD
         : API_TYPE.DEV),
@@ -227,7 +178,7 @@ const CustomGraphiQLWrapper = ({
   const subscriptionKey =
     apiType === API_TYPE.PROD ? prodSubscriptionKey : devSubscriptionKey;
   return (
-    <PureCustomGraphiQL
+    <GraphiQLWithCustomToolbar
       alert={alert}
       apiType={apiType}
       config={config}

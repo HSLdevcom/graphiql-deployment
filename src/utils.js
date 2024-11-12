@@ -47,3 +47,33 @@ export function hasRoute(
         ),
   );
 }
+
+export function getPath(
+  isDefault,
+  router,
+  apiVersion,
+  dialect,
+  dialectVersion,
+) {
+  if (isDefault) {
+    return `/${router}`;
+  }
+
+  return apiVersion === API_VERSION_2
+    ? `/${router}/${apiVersion}/${dialect}/${dialectVersion}`
+    : `/${router}/${apiVersion}`;
+}
+
+export function getQueryString(query, variables, operationName) {
+  const urlSearchParams = new URLSearchParams();
+  if (query) {
+    urlSearchParams.set('query', encodeURIComponent(query));
+  }
+  if (variables) {
+    urlSearchParams.set('variables', encodeURIComponent(variables));
+  }
+  if (operationName) {
+    urlSearchParams.set('operationName', encodeURIComponent(operationName));
+  }
+  return `?${urlSearchParams.toString()}`;
+}

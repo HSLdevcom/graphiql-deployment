@@ -1,4 +1,0 @@
-.graphiql-container .toolbar-select-options > li {
-    /* fixes https://github.com/graphql/graphiql/issues/906 */
-    text-overflow: initial !important;
-}
