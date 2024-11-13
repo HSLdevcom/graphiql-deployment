@@ -1,6 +1,11 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { API_VERSION_2, DIALECT_VERSION_1, CONFIG_LIST } from '../config';
+import { useParams, Navigate } from 'react-router-dom';
+import {
+  API_VERSION_2,
+  DIALECT_VERSION_1,
+  CONFIG_LIST,
+  DEFAULT_PATH,
+} from '../config';
 import { getApiConfig } from './utils';
 import CustomGraphiQL from './CustomGraphiQL';
 
@@ -13,5 +18,8 @@ export default () => {
     'gtfs',
     DIALECT_VERSION_1,
   );
+  if (!config) {
+    return <Navigate to={DEFAULT_PATH} />;
+  }
   return <CustomGraphiQL config={config} configList={CONFIG_LIST} />;
 };

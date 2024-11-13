@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -53,3 +53,5 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_AUTH: ${{ secrets.DOCKER_AUTH }}
+          REACT_APP_API_SUBSCRIPTION_KEY: ${{ secrets.REACT_APP_API_SUBSCRIPTION_KEY }}
+          REACT_APP_DEV_API_SUBSCRIPTION_KEY: ${{ secrets.REACT_APP_DEV_API_SUBSCRIPTION_KEY }}
