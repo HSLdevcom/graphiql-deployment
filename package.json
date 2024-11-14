@@ -2,17 +2,19 @@
   "name": "graphiql-deployment",
   "version": "1.0.0",
   "engines": {
-    "node": ">=16.16.0 <17.0.0"
+    "node": ">=16.17",
+    "npm": ">=3.0"
   },
+  "packageManager": "yarn@4.5.1",
   "private": true,
-  "homepage": "/graphiql",
   "dependencies": {
-    "graphiql": "^1.11.4",
-    "graphql": "^16.5.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-router-dom": "^5.0.0",
-    "react-scripts": "^5.0.0"
+    "graphiql": "^3.7.1",
+    "graphql": "^16.9.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^2.1.0"
   },
   "scripts": {
     "start": "PORT=8080 react-scripts start",
@@ -20,8 +22,8 @@
     "test": "react-scripts test --watchAll=false --coverage",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.js",
-    "lint:fix": "eslint --fix src/**/*.js"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -39,8 +41,20 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^8.19.0",
+    "@babel/cli": "^7.25.9",
+    "@babel/core": "^7.26.0",
+    "@babel/eslint-parser": "^7.25.9",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.26.0",
+    "babel-plugin-dynamic-import-node": "^2.3.3",
+    "babel-plugin-relay": "^18.1.0",
+    "eslint": "8.56.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-prettier": "9.1.0",
     "eslint-config-react-app": "^7.0.1",
-    "graphql-ws": "^5.9.1"
+    "eslint-plugin-compat": "^6.0.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "graphql-ws": "^5.16.0",
+    "prettier": "^3.3.3"
   }
 }
