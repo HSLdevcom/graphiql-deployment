@@ -8,24 +8,25 @@ Deployment for HSL version of [GraphiQL](https://github.com/graphql/graphiql). P
 REACT_APP_DEV_API_SUBSCRIPTION_KEY=key REACT_APP_API_SUBSCRIPTION_KEY=key REACT_APP_API_SUBSCRIPTION_KEY_PARAM=digitransit-subscription-key yarn start
 ```
 
-Environment variables `REACT_APP_DEV_API_SUBSCRIPTION_KEY`, `REACT_APP_API_SUBSCRIPTION_KEY` and `REACT_APP_API_SUBSCRIPTION_KEY_PARAM` are set to GraphQL request query string for authorization gateway service.
+Environment variables `REACT_APP_DEV_API_SUBSCRIPTION_KEY`, `REACT_APP_API_SUBSCRIPTION_KEY`, and `REACT_APP_API_SUBSCRIPTION_KEY_PARAM` are set in the GraphQL request query string for the authorization gateway service.
 
-## Run in docker
+## Docker
 
+### Build
 ```sh
-docker build -t graphiql .
-docker run -it \
-    -p 8099:8080 \
-    -e REACT_APP_DEV_API_SUBSCRIPTION_KEY=key \
-    -e REACT_APP_API_SUBSCRIPTION_KEY=key \
-    -e REACT_APP_API_SUBSCRIPTION_KEY_PARAM=digitransit-subscription-key \
-     graphiql
+docker build \
+    --build-arg REACT_APP_DEV_API_SUBSCRIPTION_KEY=key \
+    --build-arg REACT_APP_API_SUBSCRIPTION_KEY=key \
+    --build-arg REACT_APP_API_SUBSCRIPTION_KEY_PARAM=digitransit-subscription-key \
+    -t graphiql .
+```
+
+### Run
+```sh
+docker run -it -p 8099:8080 graphiql
 ```
 
 ## Code formatting
-
-Format source codebase:
-
 ```sh
-yarn format
+yarn lint
 ```
