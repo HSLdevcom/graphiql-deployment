@@ -56,12 +56,12 @@ export function getPath(
   dialectVersion,
 ) {
   if (isDefault) {
-    return `/graphiql/${router}`;
+    return `/${router}`;
   }
 
   return apiVersion === API_VERSION_2
-    ? `/graphiql/${router}/${apiVersion}/${dialect}/${dialectVersion}`
-    : `/graphiql/${router}/${apiVersion}`;
+    ? `/${router}/${apiVersion}/${dialect}/${dialectVersion}`
+    : `/${router}/${apiVersion}`;
 }
 
 export function getQueryString(query, variables, operationName) {

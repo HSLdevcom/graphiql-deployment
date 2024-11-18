@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GraphiQL from 'graphiql';
 import { ToolbarMenu } from '@graphiql/react';
@@ -113,9 +113,11 @@ const useQuery = location => {
       )
     : {};
 
-  const [query, setQuery] = useState(initial.query);
-  const [variables, setVariables] = useState(initial.variables);
-  const [operationName, setOperationName] = useState(initial.operationName);
+  const [query, setQuery] = React.useState(initial.query);
+  const [variables, setVariables] = React.useState(initial.variables);
+  const [operationName, setOperationName] = React.useState(
+    initial.operationName,
+  );
 
   return {
     query,
@@ -145,14 +147,14 @@ const CustomGraphiQLWrapper = ({
     setOperationName,
   } = useQuery(location);
 
-  const [apiType, setApiType] = useState(
+  const [apiType, setApiType] = React.useState(
     location.state?.apiType ||
       (window.location.hostname === PRODUCTION_API_URL
         ? API_TYPE.PROD
         : API_TYPE.DEV),
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const queryString = getQueryString(query, variables, operationName);
     navigate(queryString, { replace: true });
   }, [query, variables, operationName]);
@@ -206,9 +208,9 @@ export default ({ config, configList }) => {
     <CustomGraphiQLWrapper
       configList={configList}
       config={config}
-      prodSubscriptionKey={process.env.REACT_APP_API_SUBSCRIPTION_KEY}
-      devSubscriptionKey={process.env.REACT_APP_DEV_API_SUBSCRIPTION_KEY}
-      subscriptionKeyParam={process.env.REACT_APP_API_SUBSCRIPTION_KEY_PARAM}
+      prodSubscriptionKey={import.meta.env.VITE_API_SUBSCRIPTION_KEY}
+      devSubscriptionKey={import.meta.env.VITE_DEV_API_SUBSCRIPTION_KEY}
+      subscriptionKeyParam={import.meta.env.VITE_API_SUBSCRIPTION_KEY_PARAM}
     />
   );
 };

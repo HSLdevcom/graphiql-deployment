@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { API_VERSION_1, CONFIG_LIST, DEFAULT_PATH } from '../config';
 import { getApiConfig } from './utils';
