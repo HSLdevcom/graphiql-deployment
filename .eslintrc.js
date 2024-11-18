@@ -19,7 +19,7 @@ module.exports = {
     // react
     'react/button-has-type': 'warn',
     'react/destructuring-assignment': 'off',
-    'react/jsx-filename-extension': ['error', { extensions: ['.js'] }],
+    'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx'] }],
     'react/jsx-fragments': 'off',
     'react/jsx-key': 'error',
     'react/jsx-props-no-spreading': 'off',
@@ -62,8 +62,12 @@ module.exports = {
   },
   env: {
     browser: true,
-    jest: true,
   },
+  overrides: [
+    {
+      files: ['*.jsx', '*.js'],
+    },
+  ],
   plugins: ['react', 'compat', 'prettier', 'jsx-a11y'],
   settings: {
     polyfills: ['fetch', 'promises'],
