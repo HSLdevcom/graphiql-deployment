@@ -12,7 +12,10 @@ DOCKER_IMAGE_TAG_LONG=$DOCKER_IMAGE:$DOCKER_TAG_LONG
 
 # Build image
 echo "Building image: graphiql-deployment"
-docker build --tag="$DOCKER_IMAGE_TAG_LONG" .
+docker build --tag="$DOCKER_IMAGE_TAG_LONG" \
+  --build-arg VITE_API_SUBSCRIPTION_KEY_PARAM="$VITE_API_SUBSCRIPTION_KEY_PARAM" \
+  --build-arg VITE_API_SUBSCRIPTION_KEY="$VITE_API_SUBSCRIPTION_KEY" \
+  --build-arg VITE_DEV_API_SUBSCRIPTION_KEY="$VITE_DEV_API_SUBSCRIPTION_KEY"
 
 docker login -u "$DOCKER_USER" -p "$DOCKER_AUTH"
 echo "Pushing image: $DOCKER_TAG"
