@@ -11,16 +11,17 @@ export default () => {
     <BrowserRouter basename="/graphiql">
       <Routes>
         <Route path="*" element={<Navigate to={DEFAULT_PATH} />} />
-        <Route path="/:router" element={<DefaultApiRoute />}>
-          <Route
-            path={`/:router/${API_VERSION_1}`}
-            element={<Version1ApiRoute />}
-          />
-          <Route
-            path={`/:router/${API_VERSION_2}/:dialect/:dialectVersion`}
-            element={<Version2ApiRoute />}
-          />
-        </Route>
+        <Route path="/:router" element={<DefaultApiRoute />} exact />
+        <Route
+          path={`/:router/${API_VERSION_1}`}
+          element={<Version1ApiRoute />}
+          exact
+        />
+        <Route
+          path={`/:router/${API_VERSION_2}/:dialect/:dialectVersion`}
+          element={<Version2ApiRoute />}
+          exact
+        />
       </Routes>
     </BrowserRouter>
   );
