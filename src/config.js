@@ -157,38 +157,6 @@ export const CONFIGS = [
     },
   },
   {
-    router: 'waltti-alt',
-    api: {
-      [API_VERSION_2]: {
-        title: 'Waltti alt. (v2)',
-        dialect: {
-          gtfs: {
-            [DIALECT_VERSION_1]: {
-              default: true,
-              title: 'GTFS (v1)',
-              routerUrl: {
-                [API_TYPE.DEV]: buildUrl(
-                  API_TYPE.DEV,
-                  API_VERSION_2,
-                  'waltti-alt',
-                  'gtfs',
-                  DIALECT_VERSION_1,
-                ),
-                [API_TYPE.PROD]: buildUrl(
-                  API_TYPE.PROD,
-                  API_VERSION_2,
-                  'waltti-alt',
-                  'gtfs',
-                  DIALECT_VERSION_1,
-                ),
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  {
     router: 'finland',
     api: {
       [API_VERSION_1]: {
