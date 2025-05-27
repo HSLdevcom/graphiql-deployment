@@ -93,6 +93,10 @@ const GraphiQLWithCustomToolbar = ({
         </>
       )}
     </GraphiQL.Toolbar>
+    <GraphiQL.Footer>
+      <b>API:</b> {apiType ? API_CONFIG[apiType].label : ''} - <b>Endpoint:</b>{' '}
+      {config.title}
+    </GraphiQL.Footer>
   </GraphiQL>
 );
 
