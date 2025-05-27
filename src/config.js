@@ -81,13 +81,6 @@ export const CONFIGS = [
   {
     router: 'hsl',
     api: {
-      [API_VERSION_1]: {
-        title: 'HSL (v1 Deprecated)',
-        routerUrl: {
-          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'hsl'),
-          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'hsl'),
-        },
-      },
       [API_VERSION_2]: {
         title: 'HSL (v2)',
         dialect: {
@@ -120,13 +113,6 @@ export const CONFIGS = [
   {
     router: 'waltti',
     api: {
-      [API_VERSION_1]: {
-        title: 'Waltti (v1 Deprecated)',
-        routerUrl: {
-          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'waltti'),
-          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'waltti'),
-        },
-      },
       [API_VERSION_2]: {
         title: 'Waltti (v2)',
         dialect: {
@@ -159,13 +145,6 @@ export const CONFIGS = [
   {
     router: 'finland',
     api: {
-      [API_VERSION_1]: {
-        title: 'Finland (v1 Deprecated)',
-        routerUrl: {
-          [API_TYPE.DEV]: buildUrl(API_TYPE.DEV, API_VERSION_1, 'finland'),
-          [API_TYPE.PROD]: buildUrl(API_TYPE.PROD, API_VERSION_1, 'finland'),
-        },
-      },
       [API_VERSION_2]: {
         title: 'Finland (v2)',
         dialect: {
