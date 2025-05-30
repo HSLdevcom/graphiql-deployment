@@ -71,5 +71,8 @@ module.exports = {
   plugins: ['react', 'compat', 'prettier', 'jsx-a11y'],
   settings: {
     polyfills: ['fetch', 'promises'],
+    'import/resolver': {
+      typescript: {},
+    },
   },
 };

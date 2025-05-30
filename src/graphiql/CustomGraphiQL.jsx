@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import GraphiQL from 'graphiql';
+import { GraphiQL } from 'graphiql';
 import { ToolbarMenu } from '@graphiql/react';
 import graphQLFetcher from '../api/graphQLFetcher';
 import 'graphiql/graphiql.css';
@@ -31,10 +31,13 @@ const GraphiQLWithCustomToolbar = ({
     operationName={operationName || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
-    onEditOperationName={operationName => setOperationName(operationName)}
-    toolbar={{
-      additionalContent: (
+    onEditOperationName={operationName => setOperationName(operationName)}>
+    <GraphiQL.Toolbar>
+      {({ merge, prettify, copy }) => (
         <>
+          {prettify}
+          {merge}
+          {copy}
           <ToolbarMenu
             button={<div className="customgraphiql-toolbarmenu-button">EP</div>}
             label={`Endpoint: ${config.title}`}>
@@ -88,9 +91,13 @@ const GraphiQLWithCustomToolbar = ({
             )}
           </ToolbarMenu>
         </>
-      ),
-    }}
-  />
+      )}
+    </GraphiQL.Toolbar>
+    <GraphiQL.Footer>
+      <b>API:</b> {apiType ? API_CONFIG[apiType].label : ''} - <b>Endpoint:</b>{' '}
+      {config.title}
+    </GraphiQL.Footer>
+  </GraphiQL>
 );
 
 const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
