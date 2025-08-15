@@ -15,19 +15,19 @@ import {
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
+  alert,
   config,
   configList,
   graphQLFetcher,
+  onSelectApi,
+  apiType,
+  setApiType,
   query,
   variables,
   operationName,
   setQuery,
   setVariables,
   setOperationName,
-  onSelectApi,
-  apiType,
-  setApiType,
-  alert,
 }) => (
   <GraphiQL
     fetcher={graphQLFetcher(config.routerUrl[apiType])}
@@ -158,20 +158,20 @@ const CustomGraphiQLWrapper = ({
   return (
     <GraphiQLWithCustomToolbar
       alert={alert}
-      apiType={apiType}
       config={config}
       configList={configList}
       graphQLFetcher={apiUrl =>
         graphQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
       }
       onSelectApi={onSelectApi}
-      operationName={operationName}
-      query={query}
+      apiType={apiType}
       setApiType={setApiType}
-      setOperationName={setOperationName}
+      query={query}
+      variables={variables}
+      operationName={operationName}
       setQuery={setQuery}
       setVariables={setVariables}
-      variables={variables}
+      setOperationName={setOperationName}
     />
   );
 };
