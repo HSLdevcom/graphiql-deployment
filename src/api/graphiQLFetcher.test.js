@@ -3,9 +3,9 @@ import {
   addSubscriptionKey,
   buildHeaders,
   buildRequest,
-} from './graphQLFetcher';
+} from './graphiQLFetcher';
 
-describe('graphQLFetcher', () => {
+describe('graphiQLFetcher', () => {
   describe('buildHeaders', () => {
     it('should return headers with custom header', () => {
       const headers = buildHeaders({ 'X-ExtraHeader': 'abc' });

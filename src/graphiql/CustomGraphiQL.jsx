@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GraphiQL } from 'graphiql';
 import { ToolbarMenu } from '@graphiql/react';
-import graphQLFetcher from '../api/graphQLFetcher';
+import graphiQLFetcher from '../api/graphiQLFetcher';
 import 'graphiql/style.css';
 import './CustomGraphiQL.css';
 
@@ -18,7 +18,7 @@ const GraphiQLWithCustomToolbar = ({
   alert,
   config,
   configList,
-  graphQLFetcher,
+  graphiQLFetcher,
   onSelectApi,
   apiType,
   setApiType,
@@ -30,7 +30,7 @@ const GraphiQLWithCustomToolbar = ({
   setOperationName,
 }) => (
   <GraphiQL
-    fetcher={graphQLFetcher(config.routerUrl[apiType])}
+    fetcher={graphiQLFetcher(config.routerUrl[apiType])}
     initialQuery={query || undefined}
     initialVariables={variables || undefined}
     operationName={operationName || undefined}
@@ -160,8 +160,8 @@ const CustomGraphiQLWrapper = ({
       alert={alert}
       config={config}
       configList={configList}
-      graphQLFetcher={apiUrl =>
-        graphQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
+      graphiQLFetcher={apiUrl =>
+        graphiQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
       }
       onSelectApi={onSelectApi}
       apiType={apiType}

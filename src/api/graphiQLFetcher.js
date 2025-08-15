@@ -15,7 +15,7 @@ export const buildRequest = (
   apiUrl,
   subscriptionKey,
   subscriptionKeyParam,
-  graphQLParams,
+  graphiQLParams,
   headers,
 ) =>
   new Request(
@@ -27,21 +27,21 @@ export const buildRequest = (
     {
       method: 'post',
       headers: buildHeaders(headers),
-      body: JSON.stringify(graphQLParams),
+      body: JSON.stringify(graphiQLParams),
     },
   );
 
-const graphQLFetcher =
+const graphiQLFetcher =
   (apiUrl, subscriptionKey, subscriptionKeyParam = 'subscription-key') =>
-  (graphQLParams, headers = null) =>
+  (graphiQLParams, headers = null) =>
     fetch(
       buildRequest(
         apiUrl,
         subscriptionKey,
         subscriptionKeyParam,
-        graphQLParams,
+        graphiQLParams,
         headers,
       ),
     ).then(response => response.json());
 
-export default graphQLFetcher;
+export default graphiQLFetcher;
