@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { GraphiQL } from 'graphiql';
 import { ToolbarMenu } from '@graphiql/react';
 import graphQLFetcher from '../api/graphQLFetcher';
-import 'graphiql/graphiql.css';
+import 'graphiql/style.css';
 import './CustomGraphiQL.css';
 
 import {
@@ -31,8 +31,8 @@ const GraphiQLWithCustomToolbar = ({
 }) => (
   <GraphiQL
     fetcher={graphQLFetcher(config.routerUrl[apiType])}
-    query={query || undefined}
-    variables={variables || undefined}
+    initialQuery={query || undefined}
+    initialVariables={variables || undefined}
     operationName={operationName || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
