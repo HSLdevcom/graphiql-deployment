@@ -105,27 +105,6 @@ const GraphiQLWithCustomToolbar = ({
   </GraphiQL>
 );
 
-/**
- * Get query from URL and provide update function for application
- * @param {RouterLocation} location
- */
-const useQuery = location => {
-  const values = getQueryParameterValues(location);
-
-  const [query, setQuery] = useState(values.query);
-  const [variables, setVariables] = useState(values.variables);
-  const [operationName, setOperationName] = useState(values.operationName);
-
-  return {
-    query,
-    variables,
-    operationName,
-    setQuery,
-    setVariables,
-    setOperationName,
-  };
-};
-
 const CustomGraphiQLWrapper = ({
   configList,
   config,
@@ -135,14 +114,11 @@ const CustomGraphiQLWrapper = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    query,
-    variables,
-    operationName,
-    setQuery,
-    setVariables,
-    setOperationName,
-  } = useQuery(location);
+
+  const values = getQueryParameterValues(location);
+  const [query, setQuery] = useState(values.query);
+  const [variables, setVariables] = useState(values.variables);
+  const [operationName, setOperationName] = useState(values.operationName);
 
   const [apiType, setApiType] = useState(
     location.state?.apiType ||
