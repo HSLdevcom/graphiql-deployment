@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { API_VERSION_2 } from '../config';
 
 export function getApiConfig(
@@ -92,4 +93,22 @@ export function getQueryParameterValues(location) {
       )
     : {};
   return result;
+}
+
+export function addSubscriptionKey(apiUrl, key, keyParam) {
+  const url = new URL(apiUrl);
+  if (key && keyParam) {
+    url.searchParams.set(keyParam, key);
+  }
+  return url;
+}
+
+export function createGraphiQLFetcherWithSubscriptionKey(
+  apiUrl,
+  subscriptionKey,
+  subscriptionKeyParam,
+) {
+  return createGraphiQLFetcher({
+    url: addSubscriptionKey(apiUrl, subscriptionKey, subscriptionKeyParam),
+  });
 }
