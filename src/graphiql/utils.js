@@ -77,3 +77,19 @@ export function getQueryString(query, variables, operationName) {
   }
   return `?${urlSearchParams.toString()}`;
 }
+
+export function getQueryParameterValues(location) {
+  const params = new URLSearchParams(location.search);
+  const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
+  const result = location.search
+    ? QUERY_STRING_PARAMS.reduce(
+        (output, paramName) => ({
+          ...output,
+          [paramName]:
+            params.has(paramName) && decodeURIComponent(params.get(paramName)),
+        }),
+        {},
+      )
+    : {};
+  return result;
+}

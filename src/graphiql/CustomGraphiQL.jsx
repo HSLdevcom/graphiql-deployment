@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GraphiQL } from 'graphiql';
 import { ToolbarMenu } from '@graphiql/react';
@@ -6,7 +6,12 @@ import graphQLFetcher from '../api/graphQLFetcher';
 import 'graphiql/graphiql.css';
 import './CustomGraphiQL.css';
 
-import { hasRoute, getPath, getQueryString } from './utils';
+import {
+  hasRoute,
+  getPath,
+  getQueryString,
+  getQueryParameterValues,
+} from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
@@ -100,31 +105,16 @@ const GraphiQLWithCustomToolbar = ({
   </GraphiQL>
 );
 
-const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
-
 /**
  * Get query from URL and provide update function for application
  * @param {RouterLocation} location
  */
 const useQuery = location => {
-  const params = new URLSearchParams(location.search);
+  const values = getQueryParameterValues(location);
 
-  const initial = location.search
-    ? QUERY_STRING_PARAMS.reduce(
-        (output, paramName) => ({
-          ...output,
-          [paramName]:
-            params.has(paramName) && decodeURIComponent(params.get(paramName)),
-        }),
-        {},
-      )
-    : {};
-
-  const [query, setQuery] = React.useState(initial.query);
-  const [variables, setVariables] = React.useState(initial.variables);
-  const [operationName, setOperationName] = React.useState(
-    initial.operationName,
-  );
+  const [query, setQuery] = useState(values.query);
+  const [variables, setVariables] = useState(values.variables);
+  const [operationName, setOperationName] = useState(values.operationName);
 
   return {
     query,
@@ -154,14 +144,14 @@ const CustomGraphiQLWrapper = ({
     setOperationName,
   } = useQuery(location);
 
-  const [apiType, setApiType] = React.useState(
+  const [apiType, setApiType] = useState(
     location.state?.apiType ||
       (window.location.hostname === PRODUCTION_API_URL
         ? API_TYPE.PROD
         : API_TYPE.DEV),
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const queryString = getQueryString(query, variables, operationName);
     navigate(queryString, { replace: true });
   }, [query, variables, operationName]);
