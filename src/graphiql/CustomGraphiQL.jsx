@@ -1,33 +1,37 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GraphiQL } from 'graphiql';
-import { ToolbarMenu } from '@graphiql/react';
-import graphQLFetcher from '../api/graphQLFetcher';
-import 'graphiql/graphiql.css';
+import { ToolbarButton, ToolbarMenu } from '@graphiql/react';
+import 'graphiql/style.css';
 import './CustomGraphiQL.css';
-
-import { hasRoute, getPath, getQueryString } from './utils';
+import {
+  hasRoute,
+  getPath,
+  getQueryString,
+  getQueryParameterValues,
+  createGraphiQLFetcherWithSubscriptionKey,
+} from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
+  alert,
   config,
   configList,
-  graphQLFetcher,
+  graphiQLFetcher,
+  onSelectApi,
+  apiType,
+  setApiType,
   query,
   variables,
   operationName,
   setQuery,
   setVariables,
   setOperationName,
-  onSelectApi,
-  apiType,
-  setApiType,
-  alert,
 }) => (
   <GraphiQL
-    fetcher={graphQLFetcher(config.routerUrl[apiType])}
-    query={query || undefined}
-    variables={variables || undefined}
+    fetcher={graphiQLFetcher}
+    initialQuery={query || undefined}
+    initialVariables={variables || undefined}
     operationName={operationName || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
@@ -39,8 +43,11 @@ const GraphiQLWithCustomToolbar = ({
           {merge}
           {copy}
           <ToolbarMenu
-            button={<div className="customgraphiql-toolbarmenu-button">EP</div>}
-            label={`Endpoint: ${config.title}`}>
+            button={
+              <ToolbarButton label={`Endpoint: ${config.title}`}>
+                <div className="customgraphiql-toolbarmenu-button">EP</div>
+              </ToolbarButton>
+            }>
             {configList
               .filter(configItem => Boolean(configItem.routerUrl[apiType]))
               .map(configItem => (
@@ -60,9 +67,11 @@ const GraphiQLWithCustomToolbar = ({
           </ToolbarMenu>
           <ToolbarMenu
             button={
-              <div className="customgraphiql-toolbarmenu-button">API</div>
-            }
-            label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+              <ToolbarButton
+                label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+                <div className="customgraphiql-toolbarmenu-button">API</div>
+              </ToolbarButton>
+            }>
             {Object.entries(API_CONFIG).map(
               ([elementApiType, elementApiConfig]) => (
                 <ToolbarMenu.Item
@@ -100,42 +109,6 @@ const GraphiQLWithCustomToolbar = ({
   </GraphiQL>
 );
 
-const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
-
-/**
- * Get query from URL and provide update function for application
- * @param {RouterLocation} location
- */
-const useQuery = location => {
-  const params = new URLSearchParams(location.search);
-
-  const initial = location.search
-    ? QUERY_STRING_PARAMS.reduce(
-        (output, paramName) => ({
-          ...output,
-          [paramName]:
-            params.has(paramName) && decodeURIComponent(params.get(paramName)),
-        }),
-        {},
-      )
-    : {};
-
-  const [query, setQuery] = React.useState(initial.query);
-  const [variables, setVariables] = React.useState(initial.variables);
-  const [operationName, setOperationName] = React.useState(
-    initial.operationName,
-  );
-
-  return {
-    query,
-    variables,
-    operationName,
-    setQuery,
-    setVariables,
-    setOperationName,
-  };
-};
-
 const CustomGraphiQLWrapper = ({
   configList,
   config,
@@ -145,23 +118,20 @@ const CustomGraphiQLWrapper = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    query,
-    variables,
-    operationName,
-    setQuery,
-    setVariables,
-    setOperationName,
-  } = useQuery(location);
 
-  const [apiType, setApiType] = React.useState(
+  const values = getQueryParameterValues(location);
+  const [query, setQuery] = useState(values.query);
+  const [variables, setVariables] = useState(values.variables);
+  const [operationName, setOperationName] = useState(values.operationName);
+
+  const [apiType, setApiType] = useState(
     location.state?.apiType ||
       (window.location.hostname === PRODUCTION_API_URL
         ? API_TYPE.PROD
         : API_TYPE.DEV),
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const queryString = getQueryString(query, variables, operationName);
     navigate(queryString, { replace: true });
   }, [query, variables, operationName]);
@@ -192,20 +162,22 @@ const CustomGraphiQLWrapper = ({
   return (
     <GraphiQLWithCustomToolbar
       alert={alert}
-      apiType={apiType}
       config={config}
       configList={configList}
-      graphQLFetcher={apiUrl =>
-        graphQLFetcher(apiUrl, subscriptionKey, subscriptionKeyParam)
-      }
+      graphiQLFetcher={createGraphiQLFetcherWithSubscriptionKey(
+        config.routerUrl[apiType],
+        subscriptionKey,
+        subscriptionKeyParam,
+      )}
       onSelectApi={onSelectApi}
-      operationName={operationName}
-      query={query}
+      apiType={apiType}
       setApiType={setApiType}
-      setOperationName={setOperationName}
+      query={query}
+      variables={variables}
+      operationName={operationName}
       setQuery={setQuery}
       setVariables={setVariables}
-      variables={variables}
+      setOperationName={setOperationName}
     />
   );
 };
