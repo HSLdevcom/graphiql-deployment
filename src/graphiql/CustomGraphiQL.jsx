@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GraphiQL } from 'graphiql';
-import { ToolbarMenu } from '@graphiql/react';
+import { ToolbarButton, ToolbarMenu } from '@graphiql/react';
 import 'graphiql/style.css';
 import './CustomGraphiQL.css';
 import {
@@ -43,8 +43,11 @@ const GraphiQLWithCustomToolbar = ({
           {merge}
           {copy}
           <ToolbarMenu
-            button={<div className="customgraphiql-toolbarmenu-button">EP</div>}
-            label={`Endpoint: ${config.title}`}>
+            button={
+              <ToolbarButton label={`Endpoint: ${config.title}`}>
+                <div className="customgraphiql-toolbarmenu-button">EP</div>
+              </ToolbarButton>
+            }>
             {configList
               .filter(configItem => Boolean(configItem.routerUrl[apiType]))
               .map(configItem => (
@@ -64,9 +67,11 @@ const GraphiQLWithCustomToolbar = ({
           </ToolbarMenu>
           <ToolbarMenu
             button={
-              <div className="customgraphiql-toolbarmenu-button">API</div>
-            }
-            label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+              <ToolbarButton
+                label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+                <div className="customgraphiql-toolbarmenu-button">API</div>
+              </ToolbarButton>
+            }>
             {Object.entries(API_CONFIG).map(
               ([elementApiType, elementApiConfig]) => (
                 <ToolbarMenu.Item
