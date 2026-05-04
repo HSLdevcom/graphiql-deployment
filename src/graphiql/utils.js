@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import { API_VERSION_2 } from '../config';
+import { API_VERSION_2, API_CONFIG } from '../config';
 
 export function getApiConfig(
   configList,
@@ -118,4 +118,42 @@ export function createGraphiQLFetcherWithSubscriptionKey(
   return createGraphiQLFetcher({
     url: addSubscriptionKey(apiUrl, subscriptionKey, subscriptionKeyParam),
   });
+}
+
+/**
+ * Returns the preferred apiType if the given config has a route for it,
+ * otherwise falls back to the first apiType that does have a route.
+ * This ensures config.routerUrl[apiType] is never undefined.
+ *
+ * @param {String[]} configList - Parsed list of API configs
+ * @param {String} preferredType - The desired API_TYPE (e.g. 'prod' or 'dev')
+ * @param {String} router - Router name (e.g. 'hsl', 'waltti')
+ * @param {String} apiVersion - API version (e.g. 'v1' or 'v2')
+ * @param {String} dialect - API dialect (e.g. 'gtfs')
+ * @param {String} dialectVersion - Dialect version (e.g. 'v1')
+ * @returns {String} A valid apiType for the given config
+ */
+export function resolveApiType(
+  configList,
+  preferredType,
+  router,
+  apiVersion,
+  dialect,
+  dialectVersion,
+) {
+  if (
+    hasRoute(
+      configList,
+      router,
+      apiVersion,
+      dialect,
+      dialectVersion,
+      preferredType,
+    )
+  ) {
+    return preferredType;
+  }
+  return Object.keys(API_CONFIG).find(type =>
+    hasRoute(configList, router, apiVersion, dialect, dialectVersion, type),
+  );
 }

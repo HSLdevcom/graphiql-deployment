@@ -9,12 +9,12 @@ import {
   getPath,
   getQueryString,
   getQueryParameterValues,
+  resolveApiType,
   createGraphiQLFetcherWithSubscriptionKey,
 } from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
-  alert,
   config,
   configList,
   graphiQLFetcher,
@@ -48,56 +48,46 @@ const GraphiQLWithCustomToolbar = ({
                 <div className="customgraphiql-toolbarmenu-button">EP</div>
               </ToolbarButton>
             }>
-            {configList
-              .filter(configItem => Boolean(configItem.routerUrl[apiType]))
-              .map(configItem => (
-                <ToolbarMenu.Item
-                  key={`${configItem.router}:${configItem.apiVersion}`}
-                  onSelect={() =>
-                    onSelectApi(
-                      configItem.router,
-                      configItem.apiVersion,
-                      configItem.dialect,
-                      configItem.dialectVersion,
-                    )
-                  }>
-                  {configItem.title}
-                </ToolbarMenu.Item>
-              ))}
+            {configList.map(configItem => (
+              <ToolbarMenu.Item
+                key={`${configItem.router}:${configItem.apiVersion}`}
+                onSelect={() =>
+                  onSelectApi(
+                    configItem.router,
+                    configItem.apiVersion,
+                    configItem.dialect,
+                    configItem.dialectVersion,
+                  )
+                }>
+                {configItem.title}
+              </ToolbarMenu.Item>
+            ))}
           </ToolbarMenu>
           <ToolbarMenu
             button={
               <ToolbarButton
-                label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+                label={`API type: ${apiType ? API_CONFIG[apiType].label : ''}`}>
                 <div className="customgraphiql-toolbarmenu-button">API</div>
               </ToolbarButton>
             }>
-            {Object.entries(API_CONFIG).map(
-              ([elementApiType, elementApiConfig]) => (
+            {Object.entries(API_CONFIG)
+              .filter(([elementApiType]) =>
+                hasRoute(
+                  configList,
+                  config.router,
+                  config.apiVersion,
+                  config.dialect,
+                  config.dialectVersion,
+                  elementApiType,
+                ),
+              )
+              .map(([elementApiType, elementApiConfig]) => (
                 <ToolbarMenu.Item
                   key={elementApiType}
-                  onSelect={() => {
-                    if (
-                      hasRoute(
-                        configList,
-                        config.router,
-                        config.apiVersion,
-                        config.dialect,
-                        config.dialectVersion,
-                        elementApiType,
-                      )
-                    ) {
-                      setApiType(elementApiType);
-                    } else {
-                      alert(
-                        `No endpoint exists for API version: ${elementApiConfig.label}`,
-                      );
-                    }
-                  }}>
+                  onSelect={() => setApiType(elementApiType)}>
                   {elementApiConfig.label}
                 </ToolbarMenu.Item>
-              ),
-            )}
+              ))}
           </ToolbarMenu>
         </>
       )}
@@ -125,19 +115,36 @@ const CustomGraphiQLWrapper = ({
   const [headers, setHeaders] = useState(values.headers);
 
   const [apiType, setApiType] = useState(
-    values.apiType ||
-      location.state?.apiType ||
-      (window.location.hostname === PRODUCTION_API_URL
-        ? API_TYPE.PROD
-        : API_TYPE.DEV),
+    resolveApiType(
+      configList,
+      values.apiType ||
+        (window.location.hostname === PRODUCTION_API_URL
+          ? API_TYPE.PROD
+          : API_TYPE.DEV),
+      config.router,
+      config.apiVersion,
+      config.dialect,
+      config.dialectVersion,
+    ),
   );
 
   useEffect(() => {
-    const queryString = getQueryString(query, variables, headers, apiType);
-    navigate(queryString, { replace: true });
+    navigate(
+      { search: getQueryString(query, variables, headers, apiType) },
+      { replace: true },
+    );
   }, [query, variables, headers, apiType]);
 
   const onSelectApi = (router, apiVersion, dialect, dialectVersion) => {
+    const resolvedApiType = resolveApiType(
+      configList,
+      apiType,
+      router,
+      apiVersion,
+      dialect,
+      dialectVersion,
+    );
+    setApiType(resolvedApiType);
     navigate({
       pathname: getPath(
         !hasRoute(
@@ -146,15 +153,14 @@ const CustomGraphiQLWrapper = ({
           apiVersion,
           dialect,
           dialectVersion,
-          apiType,
+          resolvedApiType,
         ),
         router,
         apiVersion,
         dialect,
         dialectVersion,
       ),
-      search: getQueryString(query, variables, headers, apiType),
-      state: { apiType },
+      search: getQueryString(query, variables, headers, resolvedApiType),
     });
   };
 
@@ -162,7 +168,6 @@ const CustomGraphiQLWrapper = ({
     apiType === API_TYPE.PROD ? prodSubscriptionKey : devSubscriptionKey;
   return (
     <GraphiQLWithCustomToolbar
-      alert={alert}
       config={config}
       configList={configList}
       graphiQLFetcher={createGraphiQLFetcherWithSubscriptionKey(
