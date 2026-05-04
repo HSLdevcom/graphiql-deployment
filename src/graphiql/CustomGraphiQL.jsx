@@ -23,19 +23,19 @@ const GraphiQLWithCustomToolbar = ({
   setApiType,
   query,
   variables,
-  operationName,
+  headers,
   setQuery,
   setVariables,
-  setOperationName,
+  setHeaders,
 }) => (
   <GraphiQL
     fetcher={graphiQLFetcher}
     initialQuery={query || undefined}
     initialVariables={variables || undefined}
-    operationName={operationName || undefined}
+    initialHeaders={headers || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
-    onEditOperationName={operationName => setOperationName(operationName)}>
+    onEditHeaders={headers => setHeaders(headers)}>
     <GraphiQL.Toolbar>
       {({ merge, prettify, copy }) => (
         <>
@@ -57,8 +57,8 @@ const GraphiQLWithCustomToolbar = ({
                     onSelectApi(
                       configItem.router,
                       configItem.apiVersion,
-                      config.dialect,
-                      config.dialectVersion,
+                      configItem.dialect,
+                      configItem.dialectVersion,
                     )
                   }>
                   {configItem.title}
@@ -122,19 +122,20 @@ const CustomGraphiQLWrapper = ({
   const values = getQueryParameterValues(location);
   const [query, setQuery] = useState(values.query);
   const [variables, setVariables] = useState(values.variables);
-  const [operationName, setOperationName] = useState(values.operationName);
+  const [headers, setHeaders] = useState(values.headers);
 
   const [apiType, setApiType] = useState(
-    location.state?.apiType ||
+    values.apiType ||
+      location.state?.apiType ||
       (window.location.hostname === PRODUCTION_API_URL
         ? API_TYPE.PROD
         : API_TYPE.DEV),
   );
 
   useEffect(() => {
-    const queryString = getQueryString(query, variables, operationName);
+    const queryString = getQueryString(query, variables, headers, apiType);
     navigate(queryString, { replace: true });
-  }, [query, variables, operationName]);
+  }, [query, variables, headers, apiType]);
 
   const onSelectApi = (router, apiVersion, dialect, dialectVersion) => {
     navigate({
@@ -152,7 +153,7 @@ const CustomGraphiQLWrapper = ({
         dialect,
         dialectVersion,
       ),
-      search: getQueryString(query, variables, operationName),
+      search: getQueryString(query, variables, headers, apiType),
       state: { apiType },
     });
   };
@@ -174,10 +175,10 @@ const CustomGraphiQLWrapper = ({
       setApiType={setApiType}
       query={query}
       variables={variables}
-      operationName={operationName}
+      headers={headers}
       setQuery={setQuery}
       setVariables={setVariables}
-      setOperationName={setOperationName}
+      setHeaders={setHeaders}
     />
   );
 };

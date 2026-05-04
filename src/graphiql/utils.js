@@ -65,29 +65,36 @@ export function getPath(
     : `/${router}/${apiVersion}`;
 }
 
-export function getQueryString(query, variables, operationName) {
+function isEmptyValue(value) {
+  return !value || value.trim() === '{}' || value.trim() === '[]';
+}
+
+export function getQueryString(query, variables, headers, apiType) {
   const urlSearchParams = new URLSearchParams();
   if (query) {
-    urlSearchParams.set('query', encodeURIComponent(query));
+    urlSearchParams.set('query', query);
   }
-  if (variables) {
-    urlSearchParams.set('variables', encodeURIComponent(variables));
+  if (!isEmptyValue(variables)) {
+    urlSearchParams.set('variables', variables);
   }
-  if (operationName) {
-    urlSearchParams.set('operationName', encodeURIComponent(operationName));
+  if (!isEmptyValue(headers)) {
+    urlSearchParams.set('headers', headers);
   }
-  return `?${urlSearchParams.toString()}`;
+  if (apiType) {
+    urlSearchParams.set('apiType', apiType);
+  }
+  const qs = urlSearchParams.toString();
+  return qs ? `?${qs}` : '';
 }
 
 export function getQueryParameterValues(location) {
   const params = new URLSearchParams(location.search);
-  const QUERY_STRING_PARAMS = ['query', 'variables', 'operationName'];
+  const QUERY_STRING_PARAMS = ['query', 'variables', 'headers', 'apiType'];
   const result = location.search
     ? QUERY_STRING_PARAMS.reduce(
         (output, paramName) => ({
           ...output,
-          [paramName]:
-            params.has(paramName) && decodeURIComponent(params.get(paramName)),
+          [paramName]: params.has(paramName) ? params.get(paramName) : null,
         }),
         {},
       )
