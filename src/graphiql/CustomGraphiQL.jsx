@@ -109,6 +109,7 @@ const CustomGraphiQLWrapper = ({
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [pathname, setPathname] = useState(location.pathname);
   const values = getQueryParameterValues(location);
   const [query, setQuery] = useState(values.query);
   const [variables, setVariables] = useState(values.variables);
@@ -130,10 +131,10 @@ const CustomGraphiQLWrapper = ({
 
   useEffect(() => {
     navigate(
-      { search: getQueryString(query, variables, headers, apiType) },
+      { pathname, search: getQueryString(query, variables, headers, apiType) },
       { replace: true },
     );
-  }, [query, variables, headers, apiType]);
+  }, [query, variables, headers, apiType, pathname]);
 
   const onSelectApi = (router, apiVersion, dialect, dialectVersion) => {
     const resolvedApiType = resolveApiType(
@@ -145,8 +146,8 @@ const CustomGraphiQLWrapper = ({
       dialectVersion,
     );
     setApiType(resolvedApiType);
-    navigate({
-      pathname: getPath(
+    setPathname(
+      getPath(
         !hasRoute(
           configList,
           router,
@@ -160,8 +161,7 @@ const CustomGraphiQLWrapper = ({
         dialect,
         dialectVersion,
       ),
-      search: getQueryString(query, variables, headers, resolvedApiType),
-    });
+    );
   };
 
   const subscriptionKey =
