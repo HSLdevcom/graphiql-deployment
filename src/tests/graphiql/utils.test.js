@@ -3,7 +3,7 @@ import {
   addSubscriptionKey,
   getQueryString,
   getQueryParameterValues,
-} from './utils';
+} from '../../graphiql/utils';
 
 describe('addSubscriptionKey', () => {
   it('should set URL subscription key', () => {
