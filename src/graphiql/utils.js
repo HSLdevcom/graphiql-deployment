@@ -142,6 +142,39 @@ export function getQueryParameterValues(location) {
   return result;
 }
 
+/**
+ * Reads the active tab's editor content from GraphiQL's localStorage state.
+ * Used to initialise React state when the URL carries no query/variables/headers
+ * so that the URL immediately reflects what GraphiQL shows on a fresh load.
+ *
+ * @returns {{ query: String|null, variables: String|null, headers: String|null }}
+ *   The active tab's content, or an empty object if storage is unavailable or
+ *   the stored state cannot be parsed.
+ */
+export function readGraphiQLTabValues() {
+  try {
+    const raw =
+      typeof localStorage !== 'undefined'
+        ? localStorage.getItem('graphiql:tabState')
+        : null;
+    if (!raw) {
+      return {};
+    }
+    const state = JSON.parse(raw);
+    const tab = state.tabs[state.activeTabIndex];
+    if (!tab) {
+      return {};
+    }
+    return {
+      query: tab.query ?? null,
+      variables: tab.variables ?? null,
+      headers: tab.headers ?? null,
+    };
+  } catch {
+    return {};
+  }
+}
+
 export function addSubscriptionKey(apiUrl, key, keyParam) {
   const url = new URL(apiUrl);
   if (key && keyParam) {

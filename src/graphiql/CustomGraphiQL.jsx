@@ -10,6 +10,7 @@ import {
   getQueryString,
   getQueryParameterValues,
   resolveApiType,
+  readGraphiQLTabValues,
   createGraphiQLFetcherWithSubscriptionKey,
 } from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
@@ -109,12 +110,19 @@ const CustomGraphiQLWrapper = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [pathname, setPathname] = useState(location.pathname);
   const values = getQueryParameterValues(location);
+  if (!values.query && !values.variables && !values.headers) {
+    const storedValues = readGraphiQLTabValues();
+    values.query = storedValues.query;
+    values.variables = storedValues.variables;
+    values.headers = storedValues.headers;
+  }
+
   const [query, setQuery] = useState(values.query);
   const [variables, setVariables] = useState(values.variables);
   const [headers, setHeaders] = useState(values.headers);
 
+  const [pathname, setPathname] = useState(location.pathname);
   const [apiType, setApiType] = useState(
     resolveApiType(
       configList,

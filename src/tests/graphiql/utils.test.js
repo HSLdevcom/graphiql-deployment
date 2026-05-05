@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   addSubscriptionKey,
   getQueryString,
   getQueryParameterValues,
+  readGraphiQLTabValues,
 } from '../../graphiql/utils';
 
 describe('addSubscriptionKey', () => {
@@ -148,5 +149,78 @@ describe('getQueryParameterValues', () => {
       makeLocation(`?${params.toString()}`),
     );
     expect(values.query).toEqual(rawValue);
+  });
+});
+
+describe('readGraphiQLTabValues', () => {
+  const TAB_STATE_KEY = 'graphiql:tabState';
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it('returns empty object when localStorage has no tabState', () => {
+    expect(readGraphiQLTabValues()).toEqual({});
+  });
+
+  it('returns active tab values from stored tabState', () => {
+    const tabState = {
+      activeTabIndex: 0,
+      tabs: [
+        {
+          id: 'tab-1',
+          title: 'Tab 1',
+          query: '{ stop { id } }',
+          variables: '{"id": "1"}',
+          headers: null,
+          operationName: null,
+          response: null,
+        },
+      ],
+    };
+    localStorage.setItem(TAB_STATE_KEY, JSON.stringify(tabState));
+    const values = readGraphiQLTabValues();
+    expect(values.query).toEqual('{ stop { id } }');
+    expect(values.variables).toEqual('{"id": "1"}');
+    expect(values.headers).toBeNull();
+  });
+
+  it('returns the active tab when there are multiple tabs', () => {
+    const tabState = {
+      activeTabIndex: 1,
+      tabs: [
+        {
+          id: 'tab-1',
+          title: 'Tab 1',
+          query: 'query A { stop { id } }',
+          variables: null,
+          headers: null,
+          operationName: null,
+          response: null,
+        },
+        {
+          id: 'tab-2',
+          title: 'Tab 2',
+          query: 'query B { route { id } }',
+          variables: '{"limit": 10}',
+          headers: null,
+          operationName: null,
+          response: null,
+        },
+      ],
+    };
+    localStorage.setItem(TAB_STATE_KEY, JSON.stringify(tabState));
+    const values = readGraphiQLTabValues();
+    expect(values.query).toEqual('query B { route { id } }');
+    expect(values.variables).toEqual('{"limit": 10}');
+  });
+
+  it('returns empty object on malformed JSON', () => {
+    localStorage.setItem(TAB_STATE_KEY, 'not-valid-json{{');
+    expect(readGraphiQLTabValues()).toEqual({});
   });
 });
