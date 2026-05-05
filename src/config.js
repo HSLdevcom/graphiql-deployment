@@ -1,6 +1,7 @@
 export const API_VERSION_1 = 'v1';
 export const API_VERSION_2 = 'v2';
 export const DIALECT_VERSION_1 = 'v1';
+export const URL_VERSION = 2;
 export const PRODUCTION_API_URL = 'api.digitransit.fi';
 export const DEFAULT_PATH = '/hsl';
 export const API_TYPE = Object.freeze({
@@ -196,6 +197,31 @@ export const CONFIGS = [
                   API_TYPE.PROD,
                   API_VERSION_2,
                   'varely',
+                  'gtfs',
+                  DIALECT_VERSION_1,
+                ),
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    router: 'waltti-alt',
+    api: {
+      [API_VERSION_2]: {
+        title: 'Waltti-alt (v2)',
+        dialect: {
+          gtfs: {
+            [DIALECT_VERSION_1]: {
+              default: true,
+              title: 'GTFS (v1)',
+              routerUrl: {
+                [API_TYPE.DEV]: buildUrl(
+                  API_TYPE.DEV,
+                  API_VERSION_2,
+                  'waltti-alt',
                   'gtfs',
                   DIALECT_VERSION_1,
                 ),

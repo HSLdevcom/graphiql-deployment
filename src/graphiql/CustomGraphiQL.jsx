@@ -9,12 +9,13 @@ import {
   getPath,
   getQueryString,
   getQueryParameterValues,
+  resolveApiType,
+  readGraphiQLTabValues,
   createGraphiQLFetcherWithSubscriptionKey,
 } from './utils';
 import { API_CONFIG, PRODUCTION_API_URL, API_TYPE } from '../config';
 
 const GraphiQLWithCustomToolbar = ({
-  alert,
   config,
   configList,
   graphiQLFetcher,
@@ -23,19 +24,19 @@ const GraphiQLWithCustomToolbar = ({
   setApiType,
   query,
   variables,
-  operationName,
+  headers,
   setQuery,
   setVariables,
-  setOperationName,
+  setHeaders,
 }) => (
   <GraphiQL
     fetcher={graphiQLFetcher}
     initialQuery={query || undefined}
     initialVariables={variables || undefined}
-    operationName={operationName || undefined}
+    initialHeaders={headers || undefined}
     onEditQuery={query => setQuery(query)}
     onEditVariables={variables => setVariables(variables)}
-    onEditOperationName={operationName => setOperationName(operationName)}>
+    onEditHeaders={headers => setHeaders(headers)}>
     <GraphiQL.Toolbar>
       {({ merge, prettify, copy }) => (
         <>
@@ -48,56 +49,46 @@ const GraphiQLWithCustomToolbar = ({
                 <div className="customgraphiql-toolbarmenu-button">EP</div>
               </ToolbarButton>
             }>
-            {configList
-              .filter(configItem => Boolean(configItem.routerUrl[apiType]))
-              .map(configItem => (
-                <ToolbarMenu.Item
-                  key={`${configItem.router}:${configItem.apiVersion}`}
-                  onSelect={() =>
-                    onSelectApi(
-                      configItem.router,
-                      configItem.apiVersion,
-                      config.dialect,
-                      config.dialectVersion,
-                    )
-                  }>
-                  {configItem.title}
-                </ToolbarMenu.Item>
-              ))}
+            {configList.map(configItem => (
+              <ToolbarMenu.Item
+                key={`${configItem.router}:${configItem.apiVersion}`}
+                onSelect={() =>
+                  onSelectApi(
+                    configItem.router,
+                    configItem.apiVersion,
+                    configItem.dialect,
+                    configItem.dialectVersion,
+                  )
+                }>
+                {configItem.title}
+              </ToolbarMenu.Item>
+            ))}
           </ToolbarMenu>
           <ToolbarMenu
             button={
               <ToolbarButton
-                label={`API version: ${apiType ? API_CONFIG[apiType].label : ''}`}>
+                label={`API type: ${apiType ? API_CONFIG[apiType].label : ''}`}>
                 <div className="customgraphiql-toolbarmenu-button">API</div>
               </ToolbarButton>
             }>
-            {Object.entries(API_CONFIG).map(
-              ([elementApiType, elementApiConfig]) => (
+            {Object.entries(API_CONFIG)
+              .filter(([elementApiType]) =>
+                hasRoute(
+                  configList,
+                  config.router,
+                  config.apiVersion,
+                  config.dialect,
+                  config.dialectVersion,
+                  elementApiType,
+                ),
+              )
+              .map(([elementApiType, elementApiConfig]) => (
                 <ToolbarMenu.Item
                   key={elementApiType}
-                  onSelect={() => {
-                    if (
-                      hasRoute(
-                        configList,
-                        config.router,
-                        config.apiVersion,
-                        config.dialect,
-                        config.dialectVersion,
-                        elementApiType,
-                      )
-                    ) {
-                      setApiType(elementApiType);
-                    } else {
-                      alert(
-                        `No endpoint exists for API version: ${elementApiConfig.label}`,
-                      );
-                    }
-                  }}>
+                  onSelect={() => setApiType(elementApiType)}>
                   {elementApiConfig.label}
                 </ToolbarMenu.Item>
-              ),
-            )}
+              ))}
           </ToolbarMenu>
         </>
       )}
@@ -120,48 +111,71 @@ const CustomGraphiQLWrapper = ({
   const navigate = useNavigate();
 
   const values = getQueryParameterValues(location);
+  if (!values.query && !values.variables && !values.headers) {
+    const storedValues = readGraphiQLTabValues();
+    values.query = storedValues.query;
+    values.variables = storedValues.variables;
+    values.headers = storedValues.headers;
+  }
+
   const [query, setQuery] = useState(values.query);
   const [variables, setVariables] = useState(values.variables);
-  const [operationName, setOperationName] = useState(values.operationName);
+  const [headers, setHeaders] = useState(values.headers);
 
+  const [pathname, setPathname] = useState(location.pathname);
   const [apiType, setApiType] = useState(
-    location.state?.apiType ||
-      (window.location.hostname === PRODUCTION_API_URL
-        ? API_TYPE.PROD
-        : API_TYPE.DEV),
+    resolveApiType(
+      configList,
+      values.apiType ||
+        (window.location.hostname === PRODUCTION_API_URL
+          ? API_TYPE.PROD
+          : API_TYPE.DEV),
+      config.router,
+      config.apiVersion,
+      config.dialect,
+      config.dialectVersion,
+    ),
   );
 
   useEffect(() => {
-    const queryString = getQueryString(query, variables, operationName);
-    navigate(queryString, { replace: true });
-  }, [query, variables, operationName]);
+    navigate(
+      { pathname, search: getQueryString(query, variables, headers, apiType) },
+      { replace: true },
+    );
+  }, [query, variables, headers, apiType, pathname]);
 
   const onSelectApi = (router, apiVersion, dialect, dialectVersion) => {
-    navigate({
-      pathname: getPath(
+    const resolvedApiType = resolveApiType(
+      configList,
+      apiType,
+      router,
+      apiVersion,
+      dialect,
+      dialectVersion,
+    );
+    setApiType(resolvedApiType);
+    setPathname(
+      getPath(
         !hasRoute(
           configList,
           router,
           apiVersion,
           dialect,
           dialectVersion,
-          apiType,
+          resolvedApiType,
         ),
         router,
         apiVersion,
         dialect,
         dialectVersion,
       ),
-      search: getQueryString(query, variables, operationName),
-      state: { apiType },
-    });
+    );
   };
 
   const subscriptionKey =
     apiType === API_TYPE.PROD ? prodSubscriptionKey : devSubscriptionKey;
   return (
     <GraphiQLWithCustomToolbar
-      alert={alert}
       config={config}
       configList={configList}
       graphiQLFetcher={createGraphiQLFetcherWithSubscriptionKey(
@@ -174,10 +188,10 @@ const CustomGraphiQLWrapper = ({
       setApiType={setApiType}
       query={query}
       variables={variables}
-      operationName={operationName}
+      headers={headers}
       setQuery={setQuery}
       setVariables={setVariables}
-      setOperationName={setOperationName}
+      setHeaders={setHeaders}
     />
   );
 };
