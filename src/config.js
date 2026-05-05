@@ -1,6 +1,7 @@
 export const API_VERSION_1 = 'v1';
 export const API_VERSION_2 = 'v2';
 export const DIALECT_VERSION_1 = 'v1';
+export const URL_VERSION = 2;
 export const PRODUCTION_API_URL = 'api.digitransit.fi';
 export const DEFAULT_PATH = '/hsl';
 export const API_TYPE = Object.freeze({
