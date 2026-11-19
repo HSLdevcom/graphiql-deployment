@@ -19,7 +19,7 @@ RUN yarn install
 RUN yarn build
 
 
-FROM nginx:1.27.2-alpine
+FROM nginx:1.31.9-alpine
 WORKDIR /usr/share/nginx/html
 
 # Remove default nginx files, copy built files, and copy nginx configuration.
